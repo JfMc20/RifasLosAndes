@@ -1,0 +1,20 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Permitir indexación de todas las páginas principales
+Allow: /raffle/*
+Allow: /about
+Allow: /faq
+Allow: /contact
+
+# Bloquear rutas administrativas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Bloquear rutas de autenticación
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://rifalosandes.es/sitemap.xml

@@ -1,0 +1,84 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Archivos de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de producción
+/dist
+/build
+.next/
+out/
+
+# Cache
+.cache/
+.vercel
+.turbo
+
+# Archivos del sistema
+.DS_Store
+*.pem
+
+# Archivos de IDE y editores
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos de Docker
+.docker/
+
+# Archivos de desarrollo local
+*.local
+
+# Archivos de certificados SSL
+ssl/*.pem
+!ssl/README.md
+
+# Directorios de uploads (contienen datos, no código)
+backend/uploads/
+frontend/public/uploads/
+
+# Archivos de configuración local
+frontend/.next/
+backend/dist/
+
+# Archivos de entorno de ejemplo (no se ignoran)
+!.env.example
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archivos de depuración
+*.log
+
+# Archivos de cobertura de pruebas
+coverage/
+.nyc_output/
+
+# Archivos de dependencias de sistema operativo
+.DS_Store
+Thumbs.db
