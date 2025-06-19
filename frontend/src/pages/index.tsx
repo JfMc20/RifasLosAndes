@@ -118,19 +118,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     if (activeRaffleData && activeRaffleData.tickets) {
       // Usar los tickets reales del backend
       tickets = activeRaffleData.tickets;
-    } else if (activeRaffleData && activeRaffleData.raffle) {
-      // Fallback: generar tickets temporales solo si no hay tickets reales
-      console.warn('No se recibieron tickets reales del backend. Generando tickets temporales.');
-      const totalTickets = activeRaffleData.raffle.totalTickets || 1000;
-      tickets = Array(totalTickets).fill(null).map((_, index) => {
-        const number = String(index).padStart(3, '0');
-        return {
-          _id: `ticket-${number}`,
-          number,
-          status: TicketStatus.AVAILABLE,
-          raffle: activeRaffleData.raffle._id,
-        };
-      });
+    } else {
+      // Si no hay tickets, registrar una advertencia y continuar con un array vacío
+      console.warn('No se recibieron tickets reales del backend o no hay una rifa activa.');
     }
     
     const initialData: RaffleData = {

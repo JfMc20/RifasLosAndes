@@ -73,13 +73,33 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
     <section ref={sectionRef} className="bg-gray-100 py-10 md:py-14 relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <h2
+            className="font-title font-bold text-black drop-shadow-md text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2"
+          >
+            {carouselContent.title}
+          </h2>
+          <p
+            className="text-gray-700 drop-shadow text-xs sm:text-sm md:text-base max-w-2xl mx-auto"
+          >
+            <span className="text-yellow-600 font-medium">{carouselContent.description}</span>
+          </p>
+        </motion.div>
+
+        <div className="w-1/4 sm:w-1/6 h-0.5 bg-yellow-500 mx-auto mb-8 rounded-full"></div>
+
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="relative" // Se elimina "group" porque ya no se necesita para el hover.
+          className="relative"
         >
-          {/* ... El contenedor del carrusel se mantiene intacto ... */}
           <div className="relative overflow-hidden rounded-xl border-[3px] border-yellow-500 shadow-[0_0_18px_2px_rgba(217,119,6,0.3)]">
             <div className="relative aspect-[3/1] sm:aspect-auto sm:h-80 md:h-96 lg:h-[26rem]">
               {carouselContent.images.map((image, index) => (
@@ -89,14 +109,12 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
                     index === activeIndex ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-[1.02]'
                   }`}
                 >
-                  {/* Animación de carga cuando la imagen está cargando */}
                   {index === activeIndex && imagesLoading[index] && !imageErrors[index] && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-20">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-yellow-500"></div>
                     </div>
                   )}
                   
-                  {/* Solo renderiza las imágenes que están cargadas o cerca de serlo */}
                   {(loadedImages.includes(index) || index === activeIndex || 
                    index === (activeIndex + 1) % carouselContent.images.length) && (
                      <OptimizedImage 
@@ -107,8 +125,8 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
                        sizes="(max-width: 768px) 90vw, (max-width: 1200px) 80vw, 70vw"
                        style={{
                          objectFit: "contain",
-                         opacity: imageErrors[index] ? "0.7" : "1", // Reduce opacidad en caso de error
-                         filter: imageErrors[index] ? "grayscale(1)" : "none", // Aplica filtro en caso de error
+                         opacity: imageErrors[index] ? "0.7" : "1",
+                         filter: imageErrors[index] ? "grayscale(1)" : "none",
                        }}
                        useOptimized={true}
                        optimizedSize="md"
@@ -129,7 +147,6 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
             </div>
           </div>
 
-          {/* ... Los botones y los indicadores se mantienen intactos ... */}
           <button
             onClick={prevSlide}
             className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 bg-white bg-opacity-50 hover:bg-opacity-80 text-black rounded-full p-2 transition-all focus:outline-none"
@@ -158,36 +175,6 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
               />
             ))}
           </div>
-        </motion.div>
-
-        {/*
-          AQUÍ LA SOLUCIÓN (Opción 2):
-          - Se agrega un 'div' que actúa como una línea amarilla para conectar visualmente el carrusel con el texto.
-          - 'my-8' le da espacio vertical. 'mx-auto' la centra. 'w-1/4' controla su ancho en móvil.
-        */}
-        <div className="w-1/4 sm:w-1/6 h-0.5 bg-yellow-500 mx-auto my-8 rounded-full"></div>
-
-        {/*
-          - Se revierte este contenedor a su estado original, sin la tarjeta blanca.
-          - Se quita el margen superior ('mt-8') porque ahora lo controla el separador.
-        */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <h2
-            className="font-title font-bold text-black drop-shadow-md text-xl sm:text-2xl md:text-3xl lg:text-4xl mb-2"
-          >
-            {carouselContent.title}
-          </h2>
-          <p
-            className="text-gray-700 drop-shadow text-xs sm:text-sm md:text-base max-w-2xl mx-auto"
-          >
-            <span className="text-yellow-600 font-medium">{carouselContent.description}</span>
-          </p>
         </motion.div>
 
       </div>

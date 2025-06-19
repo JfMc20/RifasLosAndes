@@ -100,63 +100,96 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
       
       {/* Paginación */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 mt-6 pb-2">
-          <button 
-            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 bg-gray-800 text-yellow-500 rounded-md disabled:opacity-50 hover:bg-gray-700 transition-all duration-200 shadow-sm disabled:text-gray-500"
-          >
-            &laquo;
-          </button>
-          
-          <div className="flex items-center">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              // Lógica para mostrar páginas cercanas a la actual cuando hay muchas páginas
-              let pageToShow;
-              if (totalPages <= 5) {
-                pageToShow = i + 1;
-              } else if (currentPage <= 3) {
-                pageToShow = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageToShow = totalPages - 4 + i;
-              } else {
-                pageToShow = currentPage - 2 + i;
+        <div className="flex justify-center items-center space-x-1 mt-6">
+        {/* Botón de página anterior */}
+        <button 
+          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          disabled={currentPage === 1}
+          className="px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-lg font-semibold transition-all duration-300 border-2 bg-gray-700/50 text-gray-300 border-yellow-500/70 hover:bg-yellow-400/20 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          &laquo;
+        </button>
+
+        {/* Lógica de paginación inteligente */}
+        {
+          (() => {
+            const getPageNumbers = () => {
+              const pageNumbers: (string | number)[] = [];
+              const siblingCount = 1;
+              const totalPageNumbers = siblingCount + 5;
+
+              if (totalPages <= totalPageNumbers) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pageNumbers.push(i);
+                }
+                return pageNumbers;
+              }
+
+              const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
+              const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
+
+              const shouldShowLeftDots = leftSiblingIndex > 2;
+              const shouldShowRightDots = rightSiblingIndex < totalPages - 2;
+
+              if (!shouldShowLeftDots && shouldShowRightDots) {
+                const leftItemCount = 3 + 2 * siblingCount;
+                for (let i = 1; i <= leftItemCount; i++) {
+                  pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+              } else if (shouldShowLeftDots && !shouldShowRightDots) {
+                const rightItemCount = 3 + 2 * siblingCount;
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - rightItemCount + 1; i <= totalPages; i++) {
+                  pageNumbers.push(i);
+                }
+              } else if (shouldShowLeftDots && shouldShowRightDots) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = leftSiblingIndex; i <= rightSiblingIndex; i++) {
+                  pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+              }
+              return pageNumbers;
+            };
+
+            const pageItems = getPageNumbers();
+
+            return pageItems.map((page, index) => {
+              if (page === '...') {
+                return <span key={`ellipsis-${index}`} className="w-auto px-2.5 py-1.5 text-xs sm:px-0 sm:w-10 sm:h-10 sm:text-sm flex items-center justify-center text-gray-500">...</span>;
               }
               
               return (
                 <button
-                  key={pageToShow}
-                  onClick={() => handlePageChange(pageToShow)}
-                  className={`mx-1 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${pageToShow === currentPage 
-                    ? 'bg-yellow-500 text-gray-900 font-bold shadow-md shadow-yellow-500/20' 
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                  key={`page-${page}`}
+                  onClick={() => handlePageChange(page as number)}
+                  className={`px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-lg font-semibold transition-all duration-300 border-2 ${
+                    currentPage === page
+                      ? 'bg-yellow-400 text-gray-900 border-yellow-400/90 shadow-lg scale-105'
+                      : 'bg-gray-700/50 text-gray-300 border-yellow-500/70 hover:bg-yellow-400/20 hover:text-white'
+                  }`}
                 >
-                  {pageToShow}
+                  {page}
                 </button>
               );
-            })}
-            
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <>
-                <span className="mx-1 text-gray-400">...</span>
-                <button
-                  onClick={() => handlePageChange(totalPages)}
-                  className="mx-1 w-8 h-8 rounded-full flex items-center justify-center bg-gray-800 text-gray-300 hover:bg-gray-700 transition-all duration-200"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-          </div>
-          
-          <button 
-            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 bg-gray-800 text-yellow-500 rounded-md disabled:opacity-50 hover:bg-gray-700 transition-all duration-200 shadow-sm disabled:text-gray-500"
-          >
-            &raquo;
-          </button>
-        </div>
+            });
+          })()
+        }
+
+        {/* Botón de página siguiente */}
+        <button 
+          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+          disabled={currentPage === totalPages}
+          className="px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-lg font-semibold transition-all duration-300 border-2 bg-gray-700/50 text-gray-300 border-yellow-500/70 hover:bg-yellow-400/20 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          &raquo;
+        </button>
+      </div>
       )}
     </div>
   );

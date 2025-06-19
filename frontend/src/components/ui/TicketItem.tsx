@@ -22,7 +22,7 @@ const TicketItem: React.FC<TicketItemProps> = ({ number, status, onSelect, highl
     
     switch (status) {
       case TicketStatus.AVAILABLE:
-        return `bg-gray-800 text-gray-300 hover:bg-gray-700 cursor-pointer border-2 border-gray-700 hover:border-yellow-500 hover:shadow-md ${highlight ? 'border-yellow-500' : ''}`;
+        return `bg-gray-900 text-gray-300 hover:bg-gray-700 cursor-pointer border-2 border-gray-700 hover:border-yellow-500 hover:shadow-md ${highlight ? 'border-yellow-500' : ''}`;
       case TicketStatus.SELECTED:
         return `bg-yellow-500 text-gray-900 font-bold hover:bg-yellow-400 cursor-pointer border-2 border-yellow-600 shadow-lg shadow-yellow-500/20 ${highlightStyles}`;
       case TicketStatus.RESERVED:
@@ -30,7 +30,7 @@ const TicketItem: React.FC<TicketItemProps> = ({ number, status, onSelect, highl
       case TicketStatus.SOLD:
         return `bg-green-600 text-white cursor-not-allowed opacity-90 border-2 border-green-700 shadow-sm ${highlightStyles}`;
       default:
-        return `bg-gray-800 border-2 border-gray-700 ${highlightStyles}`;
+        return `bg-gray-900 border-2 border-gray-700 ${highlightStyles}`;
     }
   };
 

@@ -5,6 +5,7 @@ import SelectionSummary from '@/components/ui/SelectionSummary';
 import { useTicketSelection } from '@/hooks/useTicketSelection';
 import PopupWhatsApp from '@/components/ui/PopupWhatsApp';
 import ProgressBar from '@/components/ui/ProgressBar';
+import AnimatedCounter from '@/components/ui/AnimatedCounter';
 
 import { motion } from 'framer-motion';
 
@@ -89,9 +90,10 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
   };
 
   return (
-    <section id="tickets" className="py-12 md:py-16 bg-white relative overflow-hidden">
+    <section id="tickets" className="py-12 md:py-16 bg-gray-900 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+
         {/* Línea decorativa superior similar al header */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-600 via-green-600 to-red-600 opacity-30"></div>
         
@@ -108,32 +110,19 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <motion.h2 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           viewport={{ once: true }}
-          className="font-title text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center drop-shadow-[0_2px_3px_rgba(0,0,0,0.25)]"
+          className="text-center mb-8"
         >
-          Selecciona tus números
-        </motion.h2>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="text-text text-center mb-4 max-w-3xl mx-auto"
-        >
-          <p className="mb-4">
-            Elige los números que deseas comprar y aprovecha nuestras promociones. 
-            Una vez seleccionados, podrás completar tu compra a través de WhatsApp.
+          <h2 className="font-title text-4xl md:text-5xl font-bold text-white mb-2 [text-shadow:0_0_15px_rgba(234,179,8,0.5)]">
+            ¡Participa y Gana!
+          </h2>
+          <p className="text-gray-300 mt-2 text-lg">
+            Quedan <AnimatedCounter to={ticketStats.available} className="font-bold text-yellow-400" /> de <AnimatedCounter to={ticketStats.total} className="font-bold text-white" /> números disponibles.
           </p>
-          
-          {/* Barra de progreso */}
-          <div className="max-w-xl mx-auto my-6 px-4">
-            <ProgressBar total={ticketStats.total} sold={ticketStats.sold} />
-          </div>
         </motion.div>
         
         {/* Eliminamos las promociones de aquí ya que se mostrarán en la sección de selección */}
@@ -146,13 +135,13 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg h-full border border-gray-200">
+            <div className="bg-gray-800/60 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl h-full border-2 border-yellow-500/80">
               <motion.h3 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900"
+                className="text-3xl md:text-4xl font-bold text-center mb-2 text-white"
               >
                 Números Disponibles
               </motion.h3>
@@ -161,7 +150,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 viewport={{ once: true }}
-                className="text-center text-yellow-600 mb-8"
+                className="text-center text-yellow-400 mb-8 [text-shadow:0_0_8px_rgba(234,179,8,0.5)]"
               >
                 Haz clic en los números que deseas comprar
               </motion.p>
@@ -169,54 +158,48 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
               {/* Controles y filtros */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 {/* Filtros */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <button onClick={() => setFilterStatus('all')} className={`px-4 py-2 text-sm rounded-md transition-colors font-semibold ${filterStatus === 'all' ? 'bg-yellow-500 text-gray-900 shadow-md shadow-yellow-500/20' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>Todos</button>
-                  <button onClick={() => setFilterStatus('available')} className={`px-4 py-2 text-sm rounded-md transition-colors font-semibold ${filterStatus === 'available' ? 'bg-yellow-500 text-gray-900 shadow-md shadow-yellow-500/20' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>Disponibles</button>
-                  <button onClick={() => setFilterStatus('sold')} className={`px-4 py-2 text-sm rounded-md transition-colors font-semibold ${filterStatus === 'sold' ? 'bg-yellow-500 text-gray-900 shadow-md shadow-yellow-500/20' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>Vendidos</button>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                  {['all', 'available', 'sold'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setFilterStatus(status)}
+                      className={`px-4 py-2 text-sm rounded-lg font-semibold transition-all duration-300 border-2 ${
+                        filterStatus === status
+                          ? 'bg-yellow-400 text-gray-900 border-yellow-400/90 shadow-lg scale-105'
+                          : 'bg-gray-700/50 text-gray-300 border-yellow-500/70 hover:bg-yellow-400/20 hover:text-white'
+                      }`}
+                    >
+                      {status === 'all' ? 'Todos' : status === 'available' ? 'Disponibles' : 'Vendidos'}
+                    </button>
+                  ))}
                 </div>
 
                 {/* Búsqueda y botón de número al azar */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center md:justify-end gap-2">
                   <input
                     type="text"
+                    placeholder="Buscar..."
                     value={searchNumber}
                     onChange={(e) => setSearchNumber(e.target.value)}
-                    placeholder="Buscar..."
-                    className="w-32 px-4 py-2 text-sm bg-gray-800 text-white border border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 placeholder-gray-400"
+                    className="w-32 px-4 py-2 text-sm bg-gray-900/50 text-gray-200 border-2 border-yellow-500/70 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:outline-none transition-all duration-300"
                   />
-                  <motion.button 
+                  <button
                     onClick={selectRandomTicket}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    animate={pulseAnimation}
-                    className="px-4 py-2 text-sm bg-gray-800 text-yellow-400 border border-yellow-500/50 rounded-md hover:bg-gray-700 hover:border-yellow-500 transition-all duration-200 shadow-sm font-semibold"
+                    className="px-4 py-2 text-sm bg-gray-900/50 text-yellow-400 border-2 border-yellow-500/80 rounded-lg font-bold hover:bg-yellow-400 hover:text-gray-900 transition-all duration-300 shadow-sm"
                     title="Seleccionar un número al azar"
                   >
                     Al Azar
-                  </motion.button>
+                  </button>
                 </div>
               </div>
 
-              {/* Leyenda de colores y contador */}
-              <div className="flex flex-wrap gap-x-4 gap-y-2 items-center mb-4 text-sm text-gray-400">
-                <span>{filteredTickets.length} tickets</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3.5 h-3.5 bg-gray-800 border border-gray-700 rounded-sm"></span>
-                  <span>Disponible</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3.5 h-3.5 bg-yellow-500 rounded-sm"></span>
-                  <span>Seleccionado</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-3.5 h-3.5 bg-green-600 rounded-sm"></span>
-                  <span>Vendido</span>
-                </div>
-                 <div className="flex items-center gap-1.5">
-                  <span className="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
-                  <span>Reservado</span>
-                </div>
+              {/* Barra de progreso integrada */}
+              <div className="mb-6 px-4">
+                <ProgressBar total={ticketStats.total} sold={ticketStats.sold} />
               </div>
+
+              {/* Leyenda de colores y contador */}
+              {/* La leyenda de colores se ha eliminado según la solicitud del usuario para simplificar la interfaz */}
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
