@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Ticket, Promotion, TicketStatus } from '@/types';
 import TicketGrid from '@/components/ui/TicketGrid';
-import PromotionsDisplay from '@/components/ui/PromotionsDisplay';
 import SelectionSummary from '@/components/ui/SelectionSummary';
 import { useTicketSelection } from '@/hooks/useTicketSelection';
 import PopupWhatsApp from '@/components/ui/PopupWhatsApp';

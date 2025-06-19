@@ -53,7 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>Rifa Los Andes - Toyota Corolla 2020 SE</title>
         <meta name="description" content="Participa en la gran Rifa Los Andes y gana un Toyota Corolla 2020 SE. Números limitados disponibles." />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/images/LOGO.png" type="image/png" />
       </Head>
       <main className={`${inter.className} overflow-x-hidden w-full max-w-full`}>
         <Component {...pageProps} />

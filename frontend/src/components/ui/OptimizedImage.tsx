@@ -10,9 +10,6 @@ interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
   onLoadingStateChange?: (isLoading: boolean) => void;
 }
 
-/**
- * Componente de imagen optimizado que maneja errores, placeholders y optimizaciones automáticamente
- */
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   fallbackSrc = '/images/placeholder.jpg',
@@ -25,6 +22,16 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   quality = 85,
   ...rest
 }) => {
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.warn(`Error al cargar imagen: ${src}`);
+    (e.target as HTMLImageElement).src = fallbackSrc;
+    if (onLoadingStateChange) onLoadingStateChange(false);
+  };
+
+  const handleLoadComplete = () => {
+    if (onLoadingStateChange) onLoadingStateChange(false);
+  };
+  
   // Determinar la fuente optimizada si es aplicable
   const imageSrc = React.useMemo(() => {
     if (!useOptimized) return src;
@@ -54,18 +61,9 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       console.warn('Error al generar ruta optimizada:', error);
       return src;
     }
+    return src;
   }, [src, useOptimized, optimizedSize]);
 
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.warn(`Error al cargar imagen: ${src}`);
-    (e.target as HTMLImageElement).src = fallbackSrc;
-    if (onLoadingStateChange) onLoadingStateChange(false);
-  };
-
-  const handleLoadComplete = () => {
-    if (onLoadingStateChange) onLoadingStateChange(false);
-  };
-  
   return (
     <Image
       src={imageSrc}
