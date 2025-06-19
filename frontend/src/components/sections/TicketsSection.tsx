@@ -30,24 +30,31 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
 
   // Calcular estadísticas de tickets y aplicar filtros
   const { filteredTickets, ticketStats } = useMemo(() => {
-    const total = tickets.length;
-    const sold = tickets.filter(ticket => ticket.status === TicketStatus.SOLD).length;
-    const reserved = tickets.filter(ticket => ticket.status === TicketStatus.RESERVED).length;
-    const available = total - sold - reserved;
-    
-    // Aplicar filtrado según el estado seleccionado
-    let filtered = [...tickets];
-    if (filterStatus === 'available') {
-      filtered = tickets.filter(ticket => ticket.status === TicketStatus.AVAILABLE);
-    } else if (filterStatus === 'sold') {
-      filtered = tickets.filter(ticket => ticket.status === TicketStatus.SOLD);
+    const stats = {
+      total: tickets.length,
+      sold: tickets.filter(t => t.status === TicketStatus.SOLD).length,
+      reserved: tickets.filter(t => t.status === TicketStatus.RESERVED).length,
+      available: 0
+    };
+    stats.available = stats.total - stats.sold - stats.reserved;
+
+    let newFilteredTickets;
+    switch (filterStatus) {
+      case 'available':
+        newFilteredTickets = tickets.filter(t => t.status === TicketStatus.AVAILABLE);
+        break;
+      case 'sold':
+        newFilteredTickets = tickets.filter(t => t.status === TicketStatus.SOLD);
+        break;
+      case 'all':
+      default:
+        newFilteredTickets = tickets;
+        break;
     }
     
-
-    
     return { 
-      filteredTickets: filtered, 
-      ticketStats: { total, sold, reserved, available }
+      filteredTickets: newFilteredTickets, 
+      ticketStats: stats
     };
   }, [tickets, filterStatus]);
   // Use the custom hook to manage ticket selection logic
@@ -139,13 +146,13 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="bg-gray-900 p-6 md:p-8 rounded-lg shadow-lg h-full border border-yellow-500/30">
+            <div className="bg-white p-6 md:p-8 rounded-lg shadow-lg h-full border border-gray-200">
               <motion.h3 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold text-center mb-2 text-yellow-400"
+                className="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900"
               >
                 Números Disponibles
               </motion.h3>
@@ -154,7 +161,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 viewport={{ once: true }}
-                className="text-center text-gray-400 mb-8"
+                className="text-center text-yellow-600 mb-8"
               >
                 Haz clic en los números que deseas comprar
               </motion.p>

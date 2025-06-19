@@ -11,7 +11,7 @@ interface TicketGridProps {
   itemsPerPage?: number;
 }
 
-const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, selectedTickets, highlightNumber = '', itemsPerPage = 50 }) => {
+const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, selectedTickets, highlightNumber = '', itemsPerPage = 30 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [paginatedTickets, setPaginatedTickets] = useState<Ticket[]>([]);
   const totalPages = Math.ceil(tickets.length / itemsPerPage);
@@ -76,7 +76,7 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10 xl:grid-cols-12 gap-2 p-1"
+        className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1.5 p-1"
       >
         {paginatedTickets.map((ticket) => (
           <motion.div 
