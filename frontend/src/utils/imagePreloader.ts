@@ -75,8 +75,10 @@ export const preloadImages = async (
 export const preloadSiteImages = async (): Promise<void> => {
   // Detectar velocidad de conexión si está disponible
   const isSlowConnection = 
-    navigator.connection?.effectiveType === '2g' ||
-    navigator.connection?.saveData;
+    typeof navigator !== 'undefined' && 'connection' in navigator
+    ? (navigator as any).connection?.effectiveType === '2g' ||
+      (navigator as any).connection?.saveData
+    : false;
 
   // Imágenes críticas que deberían cargarse primero
   const criticalImages = [
@@ -116,12 +118,15 @@ export const optimizedImages = {
     const { preferredSize = 'md', format = 'webp' } = options;
     
     // Detectar si el navegador soporta AVIF
-    const supportsAvif = 
-      typeof window !== 'undefined' && 
-      window.document && 
-      document.createElement('canvas')
-        .toDataURL('image/avif')
-        .indexOf('data:image/avif') === 0;
+    let supportsAvif = false;
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        supportsAvif = document.createElement('canvas').toDataURL('image/avif').indexOf('data:image/avif') === 0;
+      } catch (e) {
+        // En algunos entornos (ej. JSDOM sin soporte canvas completo), esto puede fallar.
+        supportsAvif = false;
+      }
+    }
     
     // Usar AVIF si el navegador lo soporta y se solicita, webp como fallback
     const actualFormat = (format === 'avif' && supportsAvif) ? 'avif' : 'webp';
