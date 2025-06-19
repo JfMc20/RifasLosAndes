@@ -4,6 +4,7 @@ import Head from 'next/head';
 import AdminLayout from '../../../components/admin/Layout';
 import { ContentService } from '../../../services/content.service';
 import { AuthService } from '../../../services/auth.service';
+import { UploadService } from '../../../services/upload.service';
 import { PrizeCarouselContent } from '../../../types';
 import MediaSelector from '../../../components/admin/MediaSelector';
 import QuickInitPrizeCarousel from '../../../components/admin/QuickInitPrizeCarousel';
@@ -73,6 +74,52 @@ const PrizeCarouselPage: React.FC = () => {
   const openMediaSelector = (index: number) => {
     setCurrentImageIndex(index);
     setIsMediaSelectorOpen(true);
+  };
+  
+  // Nueva función para manejar la carga directa de archivos
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    
+    // Validar el archivo
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      alert('La imagen no debe exceder 5MB');
+      return;
+    }
+    
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      alert('Formato de imagen no válido. Use JPG, PNG, WebP o GIF');
+      return;
+    }
+    
+    try {
+      // Mostrar indicador de carga
+      const tmpImages = [...carouselContent.images];
+      tmpImages[index] = 'loading...';
+      setCarouselContent(prev => ({ ...prev, images: tmpImages }));
+      
+      // Subir archivo
+      const result = await UploadService.uploadFile(file);
+      
+      // Actualizar la URL en el estado
+      if (result && result.url) {
+        const updatedImages = [...carouselContent.images];
+        updatedImages[index] = result.url;
+        setCarouselContent(prev => ({
+          ...prev,
+          images: updatedImages
+        }));
+      }
+    } catch (err) {
+      console.error('Error al subir imagen:', err);
+      alert('Error al subir la imagen. Intente nuevamente.');
+      // Restaurar el valor anterior en caso de error
+      const originalImages = [...carouselContent.images];
+      originalImages[index] = ''; // O restaurar el valor anterior si lo guardamos
+      setCarouselContent(prev => ({ ...prev, images: originalImages }));
+    }
   };
 
   const handleSelectImage = (imageUrl: string) => {
@@ -261,13 +308,27 @@ const PrizeCarouselPage: React.FC = () => {
                                 </svg>
                               )}
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => openMediaSelector(index)}
-                              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors w-full"
-                            >
-                              {imageUrl ? 'Cambiar imagen' : 'Seleccionar imagen'}
-                            </button>
+                            <div className="flex flex-col space-y-2">
+                              <button
+                                type="button"
+                                onClick={() => openMediaSelector(index)}
+                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors w-full"
+                              >
+                                {imageUrl ? 'Seleccionar otra imagen' : 'Seleccionar imagen existente'}
+                              </button>
+                              
+                              <div className="relative w-full">
+                                <label className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors w-full flex items-center justify-center cursor-pointer">
+                                  <span>{imageUrl ? 'Subir otra imagen' : 'Subir imagen nueva'}</span>
+                                  <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={(e) => handleFileUpload(e, index)}
+                                    className="absolute inset-0 opacity-0 cursor-pointer" 
+                                  />
+                                </label>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>

@@ -60,10 +60,10 @@ const TicketsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>{raffle ? `Administrar Boletos - ${raffle.title}` : 'Administrar Boletos'}</title>
+        <title>{raffle ? `Administrar Boletos - ${raffle.name}` : 'Administrar Boletos'}</title>
       </Head>
       
-      <AdminLayout>
+      <AdminLayout title={raffle ? `Boletos: ${raffle.name}` : 'Administrar Boletos'}>
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
@@ -80,7 +80,9 @@ const TicketsPage: React.FC = () => {
         ) : (
           <>
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">{raffle?.title} - Administrar Boletos</h1>
+              <h1 className="text-2xl font-bold mb-4">
+                Boletos - {raffle.name}
+              </h1>
               <button
                 onClick={() => router.push(`/admin/raffles/${id}`)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
@@ -106,11 +108,13 @@ const TicketsPage: React.FC = () => {
             />
             
             {/* Tabla de boletos */}
-            <TicketsTable
-              tickets={currentTickets}
+            <TicketsTable 
+              tickets={currentTickets} 
               selectedTickets={selectedTickets}
               toggleTicketSelection={toggleTicketSelection}
               selectAll={selectAll}
+              updateTicketsStatus={async () => {}}
+              openSaleModal={() => {}}
             />
             
             {/* Paginación */}

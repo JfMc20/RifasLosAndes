@@ -24,9 +24,33 @@ const mockRaffleData: RaffleData = {
     isActive: true,
   },
   promotions: [
-    { _id: '1', quantity: 2, price: 35, description: '2 boletos', raffle: '1' },
-    { _id: '2', quantity: 5, price: 80, description: '5 boletos', raffle: '1' },
-    { _id: '3', quantity: 10, price: 150, description: '10 boletos', raffle: '1' },
+    { 
+      _id: '1', 
+      quantity: 2, 
+      price: 35, 
+      regularPrice: 40, // Precio regular total (2 boletos x $20)
+      discount: 5,       // Descuento total ($5 de descuento)
+      description: '2 boletos', 
+      raffle: '1' 
+    },
+    { 
+      _id: '2', 
+      quantity: 5, 
+      price: 80, 
+      regularPrice: 100, // Precio regular total (5 boletos x $20)
+      discount: 20,      // Descuento total ($20 de descuento)
+      description: '5 boletos', 
+      raffle: '1' 
+    },
+    { 
+      _id: '3', 
+      quantity: 10, 
+      price: 150, 
+      regularPrice: 200, // Precio regular total (10 boletos x $20)
+      discount: 50,      // Descuento total ($50 de descuento)
+      description: '10 boletos', 
+      raffle: '1' 
+    },
   ],
 };
 

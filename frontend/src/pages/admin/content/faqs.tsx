@@ -148,14 +148,22 @@ const FAQsManagementPage: React.FC = () => {
     try {
       setSaving(true);
       
+      // Crear una versión limpia de los datos sin campos que no deben enviarse al backend
+      const cleanData = {
+        question: faqData.question || '',
+        answer: faqData.answer || '',
+        isActive: faqData.isActive !== undefined ? faqData.isActive : true,
+        order: faqData.order !== undefined ? faqData.order : 0
+      };
+      
       if (faqData._id) {
         // Actualizar FAQ existente
-        const updatedFaq = await ContentService.updateFAQ(faqData._id, faqData);
+        const updatedFaq = await ContentService.updateFAQ(faqData._id, cleanData);
         setFaqs(faqs.map(faq => faq._id === faqData._id ? updatedFaq : faq));
       } else {
         // Crear nueva FAQ
         // Asegurarnos de que los campos requeridos estén presentes
-        if (!faqData.question || !faqData.answer) {
+        if (!cleanData.question || !cleanData.answer) {
           throw new Error('La pregunta y respuesta son obligatorias');
         }
         

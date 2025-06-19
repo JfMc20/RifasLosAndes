@@ -1,0 +1,20 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copia los archivos de definición de paquetes
+COPY package*.json ./
+
+# Instala las dependencias
+RUN npm install
+
+# No copiamos el código fuente aquí, se montará como volumen
+
+# Crea y configura el directorio de uploads
+RUN mkdir -p uploads && chown -R node:node uploads
+
+# Expone el puerto usado por la aplicación
+EXPOSE 3001
+
+# Comando para iniciar la aplicación en modo desarrollo
+CMD ["npm", "run", "start:dev"]

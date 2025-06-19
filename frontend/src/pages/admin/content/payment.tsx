@@ -265,19 +265,19 @@ const PaymentMethodsPage: React.FC = () => {
       }
       
       // IMPORTANTE: Solo incluir los campos que el backend acepta
-      // Eliminamos accountNumber y accountOwner ya que el backend los está rechazando
+      // Crear un objeto limpio sin campos adicionales que puedan causar errores
       const validData: Partial<PaymentMethod> = {
         name: methodData.name || '',
         description: methodData.description || '',
-        imageUrl: methodData.imageUrl,
-        isActive: methodData.isActive !== false
+        imageUrl: methodData.imageUrl || '',
+        isActive: methodData.isActive !== undefined ? methodData.isActive : true
       };
       
-      // Añadir el ID si estamos actualizando
-      if (methodData._id) {
-        validData._id = methodData._id;
-      }
-
+      // NUNCA incluir _id, createdAt, updatedAt, o __v en el objeto que se envía para actualizar
+      // El ID debe ir en la URL del endpoint, no como parte del payload
+      
+      console.log('Datos a enviar al backend:', JSON.stringify(validData, null, 2));
+      
       if (methodData._id) {
         // Actualizar método existente
         const updatedMethod = await ContentService.updatePaymentMethod(methodData._id, validData);

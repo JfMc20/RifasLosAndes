@@ -112,12 +112,16 @@ const SelectionSummary: React.FC<SelectionSummaryProps> = ({
               {/* Contenedor para la imagen y su difuminado */} 
               <div className="relative w-full h-full z-10"> {/* Este div necesita un z-index para que los círculos (z-0) queden detrás */} 
                 <div className="relative w-full h-full drop-shadow-xl">
-                  <Image 
-                    src="/images/personados.png" 
-                    alt="Persona sosteniendo tickets de rifa"
-                    layout="fill"
-                    objectFit="contain"
-                    className="[mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]"
+                  <Image
+                    src="/images/optimized/personados-md.webp" 
+                    alt="Personas en rifa"
+                    width={500}
+                    height={500}
+                    quality={80}
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PC9zdmc+"
+                    style={{ objectFit: "contain" }}
+                    className="drop-shadow-lg rounded-lg"
                   />
                 </div>
               </div>

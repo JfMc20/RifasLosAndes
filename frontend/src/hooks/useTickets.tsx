@@ -141,8 +141,13 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
       // Convertir la búsqueda a minúsculas para comparación insensible a mayúsculas
       const query = searchQuery.trim().toLowerCase();
       
-      // Buscar en el número del boleto (siempre debe existir)
-      if (ticket.number && ticket.number.toLowerCase().includes(query)) {
+      // Búsqueda exacta por número de boleto (prioridad alta)
+      if (ticket.number === searchQuery.trim()) {
+        return true;
+      }
+      
+      // Búsqueda por coincidencia parcial en número de boleto
+      if (ticket.number && ticket.number.includes(query)) {
         return true;
       }
       

@@ -11,7 +11,7 @@ RUN npm install
 # Copia el código fuente
 COPY . .
 
-# Construye la aplicación
+# Construye la aplicación con salida standalone
 RUN npm run build
 
 # Etapa de producción
@@ -22,12 +22,12 @@ WORKDIR /app
 # Configura para producción
 ENV NODE_ENV production
 
-# Copia archivos necesarios desde la etapa de construcción
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.js ./
+# Copia el servidor standalone y sus dependencias
+COPY --from=builder /app/.next/standalone ./
+
+# Copia archivos públicos y estáticos necesarios
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next/static ./.next/static
 
 # Cambia al usuario node para mejorar la seguridad
 USER node
@@ -35,5 +35,5 @@ USER node
 # Expone el puerto usado por la aplicación
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "run", "start"]
+# Comando para iniciar la aplicación en modo standalone
+CMD ["node", "server.js"]

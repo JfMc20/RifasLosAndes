@@ -71,9 +71,14 @@ const EditRafflePage: React.FC = () => {
           // Actualizar promoción existente
           await RaffleService.updatePromotion(promo._id, promo);
         } else {
-          // Crear nueva promoción
+          // Crear nueva promoción - asegurando que quantity tenga un valor por defecto
           await RaffleService.createPromotion({
-            ...promo,
+            quantity: 1, // Valor por defecto
+            price: 0,    // Valores por defecto requeridos
+            regularPrice: 0,
+            discount: 0,
+            description: '',
+            ...promo,    // Sobrescribir con los valores proporcionados
             raffle: id
           });
         }

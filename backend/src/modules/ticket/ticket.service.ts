@@ -277,9 +277,30 @@ export class TicketService {
 
   // Update multiple tickets status
   async updateMultipleTicketsStatus(updateDto: UpdateMultipleTicketsStatusDto, raffleId: string) {
+    // Objeto de actualización - depende del estado
+    let updateObject;
+    
+    if (updateDto.status === TicketStatus.AVAILABLE) {
+      // Si el estado es AVAILABLE, limpiar toda la información del comprador
+      updateObject = {
+        status: updateDto.status,
+        buyerName: null,
+        buyerEmail: null,
+        buyerPhone: null,
+        transactionId: null
+      };
+    } else {
+      // Para otros estados, solo cambiar el estado
+      updateObject = { status: updateDto.status };
+    }
+    
+    console.log(`Actualizando tickets: ${updateDto.ticketNumbers.join(', ')}`);
+    console.log(`Cambio de estado a: ${updateDto.status}`);
+    console.log('Datos de actualización:', updateObject);
+    
     const result = await this.ticketModel.updateMany(
       { raffle: raffleId, number: { $in: updateDto.ticketNumbers } },
-      { status: updateDto.status }
+      updateObject
     ).exec();
     
     return { 

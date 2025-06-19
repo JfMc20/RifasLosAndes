@@ -101,8 +101,8 @@ const UploadsPage: React.FC = () => {
         return;
       }
 
-      // Enviar archivos directamente al servidor usando el método correcto uploadMultipleFiles
-      await UploadService.uploadMultipleFiles(selectedFiles);
+      // Enviar archivos directamente al servidor usando el método uploadMultiple
+      await UploadService.uploadMultiple(selectedFiles);
       
       // Recargar lista de archivos
       await loadFiles();

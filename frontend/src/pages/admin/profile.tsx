@@ -119,7 +119,7 @@ const ProfilePage: React.FC = () => {
       await UserService.updateProfile(profileData);
       
       // Actualizar datos del usuario en la sesión
-      const updatedUser = await AuthService.getCurrentUser(true);
+      const updatedUser = await AuthService.getProfile();
       setUser(updatedUser);
       
       setSuccess('Perfil actualizado con éxito');

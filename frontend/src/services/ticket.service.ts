@@ -1,7 +1,7 @@
 import { ApiService } from './api';
 import { Ticket, TicketStatus } from '../types';
 
-interface TicketStatusSummary {
+export interface TicketStatusSummary {
   [TicketStatus.AVAILABLE]: number;
   [TicketStatus.RESERVED]: number;
   [TicketStatus.SOLD]: number;

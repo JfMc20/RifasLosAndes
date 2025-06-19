@@ -1,9 +1,9 @@
 import { ApiService } from './api';
 
 // Constante para la URL base de los archivos (puerto del backend, no del frontend)
-// URL base para acceder a los archivos directamente (sin /api)
+// URL base para acceder a los archivos directamente
 export const FILES_BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') 
+  ? process.env.NEXT_PUBLIC_API_URL
   : 'http://localhost:3001';
 
 /**
@@ -32,13 +32,19 @@ export class FileService {
     // Eliminar cualquier '/' inicial para evitar rutas mal formadas
     filePath = filePath.replace(/^\/+/, '');
     
-    // Si no contiene 'uploads/', añadirlo
-    if (!filePath.startsWith('uploads/')) {
-      filePath = `uploads/${filePath}`;
+    // Si la ruta ya está en el formato '/api/uploads/...' simplemente devolvemos la URL base + ruta
+    if (filePath.startsWith('api/uploads/')) {
+      return `${FILES_BASE_URL.replace(/\/api$/, '')}/${filePath}`;
     }
     
-    // Construir la URL completa siempre usando el puerto del backend
-    return `${FILES_BASE_URL}/${filePath}`;
+    // Si la ruta ya está en el formato 'uploads/...' simplemente devolvemos la URL base + ruta
+    if (filePath.startsWith('uploads/')) {
+      // Si FILES_BASE_URL termina en /api, lo quitamos para acceder a los archivos estáticos
+      return `${FILES_BASE_URL.replace(/\/api$/, '')}/${filePath}`;
+    }
+    
+    // Si no contiene 'uploads/', añadirlo
+    return `${FILES_BASE_URL.replace(/\/api$/, '')}/uploads/${filePath}`;
   }
   
   /**

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import AdminLayout from '../../components/admin/Layout';
 import { RaffleService } from '../../services/raffle.service';
-import { TicketService } from '../../services/ticket.service';
+import { TicketService, type TicketStatusSummary } from '../../services/ticket.service';
 import { AuthService } from '../../services/auth.service';
 import { Raffle, TicketStatus, Ticket } from '../../types';
 // Importamos el componente de barra de progreso de tickets
@@ -45,10 +45,11 @@ const Dashboard: React.FC = () => {
           console.log('Resumen de tickets (raw):', summary);
           
           // Asegurarse de que el resumen tiene la estructura correcta
-          const formattedSummary = {
-            [TicketStatus.AVAILABLE]: summary.disponible || summary[TicketStatus.AVAILABLE] || 0,
-            [TicketStatus.RESERVED]: summary.reservados || summary[TicketStatus.RESERVED] || 0,
-            [TicketStatus.SOLD]: summary.vendidos || summary[TicketStatus.SOLD] || 0
+          // La interfaz TicketStatusSummary espera las propiedades en inglés
+          const formattedSummary: TicketStatusSummary = {
+            [TicketStatus.AVAILABLE]: summary[TicketStatus.AVAILABLE] || 0,
+            [TicketStatus.RESERVED]: summary[TicketStatus.RESERVED] || 0,
+            [TicketStatus.SOLD]: summary[TicketStatus.SOLD] || 0
           };
           
           console.log('Resumen formateado:', formattedSummary);

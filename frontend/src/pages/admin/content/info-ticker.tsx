@@ -222,11 +222,16 @@ const InfoTickerPage: React.FC = () => {
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                           </svg>
                         </div>
-                        <div className="ml-3">
+                        <div className="ml-3 flex-grow">
                           <h3 className="text-sm font-medium text-yellow-800">Vista Previa</h3>
                           <div className="mt-2 text-sm text-yellow-700">
-                            <div className="bg-yellow-500 py-2 px-4 text-black rounded-md whitespace-nowrap overflow-hidden">
-                              💰 Precio: {infoTicker.ticketPrice || '[precio]'} · 📅 Fecha de sorteo: {infoTicker.drawDate || '[fecha]'} · 📱 Anuncio por: {infoTicker.announcementChannel || '[canal]'} {infoTicker.additionalInfo ? `· ℹ️ ${infoTicker.additionalInfo}` : ''}
+                            <div className="bg-yellow-500 py-2 px-4 text-black rounded-md overflow-hidden max-h-24 overflow-y-auto">
+                              <p className="whitespace-normal break-words">
+                                💰 Precio: {infoTicker.ticketPrice || '[precio]'} · 
+                                📅 Fecha de sorteo: {infoTicker.drawDate || '[fecha]'} · 
+                                📱 Anuncio por: {infoTicker.announcementChannel || '[canal]'} 
+                                {infoTicker.additionalInfo ? `· ℹ️ ${infoTicker.additionalInfo}` : ''}
+                              </p>
                             </div>
                           </div>
                         </div>

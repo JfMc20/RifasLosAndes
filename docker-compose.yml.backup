@@ -1,0 +1,103 @@
+version: '3'
+
+services:
+  # Base de datos MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: rifas-mongodb
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+    networks:
+      - easypanel
+    # Exposición de puerto comentada por seguridad en producción
+    # ports:
+    #   - "27017:27017"
+  
+  # Backend (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rifas-backend
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/rifas-los-andes
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-tu_clave_secreta_para_jwt}
+      - FRONTEND_URL=${DOMAIN:-https://rifalosandes.es}
+    volumes:
+      - backend_uploads:/app/uploads
+    restart: always
+    networks:
+      - rifas-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rifas-backend.rule=Host(`api.rifalosandes.es`)"
+      - "traefik.http.routers.rifas-backend.entrypoints=https"
+      - "traefik.http.routers.rifas-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.rifas-backend.loadbalancer.server.port=3001"
+  
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rifas-frontend
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.rifalosandes.es
+      - NEXT_PUBLIC_WHATSAPP_NUMBER=17083621726
+      - DOMAIN_NAME=rifalosandes.es
+    restart: always
+    networks:
+      - rifas-network
+    labels:
+      # Configuración para rifalosandes.es
+      - "traefik.enable=true"
+      - "traefik.http.routers.rifas-frontend.rule=Host(`rifalosandes.es`)"
+      - "traefik.http.routers.rifas-frontend.entrypoints=https"
+      - "traefik.http.routers.rifas-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rifas-frontend.tls.domains[0].main=rifalosandes.es"
+      - "traefik.http.services.rifas-frontend.loadbalancer.server.port=3000"
+      
+      # Configuración para www.rifalosandes.es (redirige a rifalosandes.es)
+      - "traefik.http.routers.rifas-frontend-www.rule=Host(`www.rifalosandes.es`)"
+      - "traefik.http.routers.rifas-frontend-www.entrypoints=https"
+      - "traefik.http.routers.rifas-frontend-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rifas-frontend-www.service=rifas-frontend"
+      - "traefik.http.routers.rifas-frontend-www.middlewares=redirect-to-non-www"
+      
+      # Middleware para redirigir www a no-www
+      - "traefik.http.middlewares.redirect-to-non-www.redirectregex.regex=^https?://www\\.(.+)"
+      - "traefik.http.middlewares.redirect-to-non-www.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.redirect-to-non-www.redirectregex.permanent=true"
+      
+      # Redirección HTTP a HTTPS para rifalosandes.es
+      - "traefik.http.routers.rifas-frontend-http.rule=Host(`rifalosandes.es`)"
+      - "traefik.http.routers.rifas-frontend-http.entrypoints=http"
+      - "traefik.http.routers.rifas-frontend-http.middlewares=redirect-to-https"
+      
+      # Redirección HTTP a HTTPS para www.rifalosandes.es
+      - "traefik.http.routers.rifas-frontend-www-http.rule=Host(`www.rifalosandes.es`)"
+      - "traefik.http.routers.rifas-frontend-www-http.entrypoints=http"
+      - "traefik.http.routers.rifas-frontend-www-http.middlewares=redirect-to-https"
+      
+      # Configuración de redirección a HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+volumes:
+  mongodb_data:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  easypanel:
+    external: true
+  web:
+    external: true

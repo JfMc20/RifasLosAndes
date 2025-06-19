@@ -41,12 +41,14 @@ export interface Promotion {
   _id: string;
   quantity: number;
   price: number;
-  regularPrice: number;  // Precio individual regular por boleto
-  discount: number;     // Descuento total aplicado en la promoción
+  // Eliminamos regularPrice y discount que no existen en el backend
   description: string;
   raffle: string;
   createdAt?: string;
   updatedAt?: string;
+  // Propiedades de UI para cálculos en frontend (no se envían al backend)
+  regularPrice?: number;  // Precio individual regular por boleto (solo UI)
+  discount?: number;     // Descuento total aplicado en la promoción (solo UI)
 }
 
 // Interface para los métodos de pago

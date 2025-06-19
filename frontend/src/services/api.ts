@@ -23,12 +23,20 @@ const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-// Add token to requests if available (for admin panel)
+// Add token to requests if available and ensure 'api' prefix is present
 axiosInstance.interceptors.request.use((config) => {
+  // Add auth token if available
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  // Ensure all requests have /api prefix
+  if (config.url && !config.url.startsWith('/api') && !config.url.startsWith('http')) {
+    // Add /api prefix to relative URLs that don't already have it
+    config.url = `/api${config.url.startsWith('/') ? '' : '/'}${config.url}`;
+  }
+  
   return config;
 });
 
@@ -344,7 +352,9 @@ export class ApiService {
     };
   }
 
-  // Generic POST request
+  /**
+   * POST request
+   */
   static async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response = await axiosInstance.post<T>(url, data, config);
@@ -353,8 +363,28 @@ export class ApiService {
       throw this.handleError(error);
     }
   }
+  
+  /**
+   * POST request con FormData (para subida de archivos)
+   */
+  static async postFormData<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const formConfig = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      ...config
+    };
+    try {
+      const response = await axiosInstance.post<T>(url, formData, formConfig);
+      return this.transformResponse<T>(response);
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
 
-  // Generic PUT request
+  /**
+   * PUT request
+   */
   static async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response = await axiosInstance.put<T>(url, data, config);
@@ -364,7 +394,9 @@ export class ApiService {
     }
   }
 
-  // Generic DELETE request
+  /**
+   * DELETE request
+   */
   static async delete<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
       const response = await axiosInstance.delete<T>(url, config);

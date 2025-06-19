@@ -123,13 +123,19 @@ const HeroContentPage: React.FC = () => {
       }
       
       // Preparar datos para enviar al API - solo incluir propiedades válidas
+      // Asegurarse de que todos los campos requeridos tienen valores válidos
       const heroData = {
-        title: heroContent.title,
-        subtitle: heroContent.subtitle,
-        description: heroContent.description,
-        imageUrl: imageUrl,
-        _id: heroContent._id || undefined // Incluir ID si existe
+        title: heroContent.title || '',
+        subtitle: heroContent.subtitle || '',
+        description: heroContent.description || '', // El campo description es requerido
+        imageUrl: imageUrl || '', // El campo imageUrl es requerido
+        buttonText: heroContent.buttonText || ''
       };
+      
+      // Si hay un ID existente, hacer un update, sino crear nuevo
+      if (heroContent._id) {
+        heroData['_id'] = heroContent._id;
+      }
       
       // Log de datos que se envían para debugging
       console.log('Enviando datos al backend (limpiados):', JSON.stringify(heroData));

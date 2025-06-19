@@ -24,18 +24,38 @@ const CreateRaffle: React.FC = () => {
     promotions: Partial<Promotion>[]
   ) => {
     try {
+      // Asegurar que todos los campos requeridos estén presentes
+      const raffleToCreate: Omit<Raffle, '_id'> = {
+        name: raffleData.name || 'Nueva Rifa',
+        prize: raffleData.prize || 'Premio por definir',
+        totalTickets: raffleData.totalTickets || 1000,
+        ticketPrice: raffleData.ticketPrice || 100,
+        drawMethod: raffleData.drawMethod || 'sorteo',
+        isActive: raffleData.isActive || false,
+        ...raffleData // Sobrescribir con los valores proporcionados
+      };
+      
       // Crear la rifa
-      const newRaffle = await RaffleService.createRaffle(raffleData);
+      const newRaffle = await RaffleService.createRaffle(raffleToCreate);
       
       // Crear las promociones asociadas a la rifa
       if (newRaffle._id && promotions.length > 0) {
         await Promise.all(
-          promotions.map(promotion => 
-            RaffleService.createPromotion({
-              ...promotion,
-              raffle: newRaffle._id
-            })
-          )
+          promotions.map(promotion => {
+            // Asegurar que todos los campos requeridos estén presentes
+            const promotionToCreate: Omit<Promotion, '_id'> = {
+              quantity: promotion.quantity || 1,
+              price: promotion.price || 0,
+              description: promotion.description || '',
+              raffle: newRaffle._id,
+              // Filtramos solo las propiedades permitidas, eliminando regularPrice y discount
+              ...Object.keys(promotion)
+                .filter(key => ['quantity', 'price', 'description', 'raffle'].includes(key))
+                .reduce((obj, key) => ({ ...obj, [key]: promotion[key] }), {})
+            };
+            
+            return RaffleService.createPromotion(promotionToCreate);
+          })
         );
       }
       

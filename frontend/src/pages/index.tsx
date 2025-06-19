@@ -64,7 +64,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
   try {
     console.log('Fetching data from API for homepage...');
     
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+    // Asegurar que la URL de la API tenga el formato correcto
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_URL = `${API_BASE_URL}/api`; // Añadir explícitamente el prefijo /api
+    
+    console.log(`Utilizando URL de API: ${API_URL}`);
     
     // Fetch data from the real backend API
     const [
@@ -75,12 +79,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
       paymentMethodsResponse,
       faqsResponse
     ] = await Promise.all([
-      fetch(`${API_BASE_URL}/raffle/active-with-tickets`), // Endpoint actualizado para rifa activa con tickets
-      fetch(`${API_BASE_URL}/content/hero`),
-      fetch(`${API_BASE_URL}/content/prize-carousel`), // Obtener contenido del carrusel de premios
-      fetch(`${API_BASE_URL}/content/info-ticker`), // Obtener contenido del ticker de información
-      fetch(`${API_BASE_URL}/content/payment-methods`),
-      fetch(`${API_BASE_URL}/content/faqs`)
+      fetch(`${API_URL}/raffle/active-with-tickets`), // Endpoint actualizado para rifa activa con tickets
+      fetch(`${API_URL}/content/hero`),
+      fetch(`${API_URL}/content/prize-carousel`), // Obtener contenido del carrusel de premios
+      fetch(`${API_URL}/content/info-ticker`), // Obtener contenido del ticker de información
+      fetch(`${API_URL}/content/payment-methods`),
+      fetch(`${API_URL}/content/faqs`)
     ]);
     
     // Obtener la rifa activa, sus promociones y tickets reales

@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  # Base de datos MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: rifas-mongodb-dev
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+    ports:
+      - "27017:27017"
+  
+  # Backend (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: rifas-backend-dev
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/rifaslosandes
+      - PORT=3001
+      - JWT_SECRET=desarrollo_local_jwt_secret
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_uploads:/app/uploads
+    restart: always
+    ports:
+      - "3001:3001"
+  
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: rifas-frontend-dev
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_WHATSAPP_NUMBER=17083621726
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: always
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongodb_data:
+    driver: local
+  backend_uploads:
+    driver: local
