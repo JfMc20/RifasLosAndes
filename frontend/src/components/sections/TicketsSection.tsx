@@ -27,7 +27,7 @@ interface TicketsSectionProps {
 const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) => {
   // Estados para filtrado
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [searchNumber, setSearchNumber] = useState<string>('');  // Estado para la búsqueda de número específico
+  const [searchNumber, setSearchNumber] = useState<string>('');   // Estado para la búsqueda de número específico
 
   // Calcular estadísticas de tickets y aplicar filtros
   const { filteredTickets, ticketStats } = useMemo(() => {
@@ -52,9 +52,9 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
         newFilteredTickets = tickets;
         break;
     }
-    
-    return { 
-      filteredTickets: newFilteredTickets, 
+
+    return {
+      filteredTickets: newFilteredTickets,
       ticketStats: stats
     };
   }, [tickets, filterStatus]);
@@ -78,7 +78,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
     if (availableTickets.length > 0) {
       const randomIndex = Math.floor(Math.random() * availableTickets.length);
       const randomTicket = availableTickets[randomIndex];
-      
+
       // Establece el número de búsqueda para resaltarlo
       setSearchNumber(randomTicket.number);
 
@@ -96,19 +96,12 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
 
         {/* Línea decorativa superior similar al header */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-600 via-green-600 to-red-600 opacity-30"></div>
-        
-        {/* Círculos decorativos en negro semi-transparentes */}
-        <div className="absolute top-1/4 left-1/6 w-32 h-32 rounded-full bg-black opacity-[0.04] blur-sm"></div>
-        <div className="absolute bottom-1/3 right-1/6 w-48 h-48 rounded-full bg-black opacity-[0.03] blur-sm"></div>
-        <div className="absolute top-2/3 left-1/3 w-16 h-16 rounded-full bg-black opacity-[0.05] blur-sm"></div>
-        <div className="absolute top-1/2 right-1/4 w-24 h-24 rounded-full bg-black opacity-[0.04] blur-sm"></div>
-        
-        {/* Círculos de color muy sutiles */}
-        <div className="absolute top-10 left-10 md:left-1/4 w-72 h-72 rounded-full bg-yellow-500 opacity-[0.08] blur-md"></div>
-        <div className="absolute bottom-[-2rem] right-[-2rem] md:bottom-[-3rem] md:right-[-3rem] w-80 h-80 rounded-full bg-green-600 opacity-[0.07] blur-md"></div>
-        <div className="absolute top-1/2 left-1/6 w-52 h-52 rounded-full bg-red-600 opacity-[0.07] blur-md"></div>
+
+        {/* Círculos decorativos en negro semi-transparentes - ELIMINADOS */}
+        {/* Círculos de color muy sutiles - ELIMINADOS */}
+        {/* Todas las líneas de círculos eliminadas como solicitaste */}
       </div>
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -124,11 +117,11 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             Quedan <AnimatedCounter to={ticketStats.available} className="font-bold text-yellow-400" /> de <AnimatedCounter to={ticketStats.total} className="font-bold text-white" /> números disponibles.
           </p>
         </motion.div>
-        
+
         {/* Eliminamos las promociones de aquí ya que se mostrarán en la sección de selección */}
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -136,7 +129,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             className="lg:col-span-2"
           >
             <div className="bg-gray-800/60 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl h-full border-2 border-yellow-500/80">
-              <motion.h3 
+              <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
@@ -154,7 +147,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
               >
                 Haz clic en los números que deseas comprar
               </motion.p>
-              
+
               {/* Controles y filtros */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 {/* Filtros */}
@@ -215,8 +208,8 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
               </motion.div>
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -233,7 +226,7 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             />
           </motion.div>
         </div>
-        
+
         {/* Pop-up de WhatsApp para completar la compra */}
         <PopupWhatsApp
           isOpen={isWhatsAppPopupOpen}

@@ -9,6 +9,7 @@ import Footer from '@/components/layout/Footer';
 // Import section components
 import HeroSection from '@/components/sections/HeroSection';
 import PrizeCarouselSection from '@/components/sections/PrizeCarouselSection';
+import SocialMediaBanner from '@/components/sections/SocialMediaBanner';
 import TicketsSection from '@/components/sections/TicketsSection';
 import PaymentMethodsSection from '@/components/sections/PaymentMethodsSection';
 import FAQSection from '@/components/sections/FAQSection';
@@ -50,6 +51,7 @@ export default function HomePage({ initialData }: HomePageProps) {
       <main className="font-montserrat">
         <HeroSection heroContent={heroContent} infoTicker={infoTicker} />
         {prizeCarouselContent && <PrizeCarouselSection carouselContent={prizeCarouselContent} />}
+        <SocialMediaBanner />
         <TicketsSection tickets={tickets} promotions={promotions} />
         <PaymentMethodsSection paymentMethods={paymentMethods} />
         <FAQSection faqs={faqs} />

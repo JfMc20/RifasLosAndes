@@ -1,74 +1,54 @@
 import React from 'react';
 import Link from 'next/link';
+import { FaInstagram, FaTiktok, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white py-8 relative overflow-hidden">
-      {/* Elementos decorativos de fondo */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Línea decorativa superior similar al header */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
-        
-        {/* Círculos decorativos en negro semi-transparentes */}
-        <div className="absolute top-1/4 right-1/6 w-32 h-32 rounded-full bg-black opacity-[0.03]"></div>
-        <div className="absolute bottom-1/3 left-1/6 w-48 h-48 rounded-full bg-black opacity-[0.02]"></div>
-        <div className="absolute top-2/3 right-1/3 w-16 h-16 rounded-full bg-black opacity-[0.04]"></div>
-        
-        {/* Círculos de color muy sutiles */}
-        <div className="absolute top-10 left-10 w-40 h-40 bg-red-600 opacity-[0.05] rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-24 h-24 bg-green-600 opacity-[0.05] rounded-full blur-xl"></div>
-      </div>
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="font-title text-xl font-bold mb-4 uppercase">Rifa Los Andes</h3>
-            <p className="text-white">
-              Tu oportunidad de ganar un Toyota Corolla 2020 SE por solo $30 USD.
-            </p>
-          </div>
-          
-          <div>
-            <h4 className="font-title text-lg font-bold mb-4 uppercase">Enlaces rápidos</h4>
+    <footer className="bg-gray-900 text-gray-300">
+      <div className="border-t-2 border-yellow-500"></div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <h2 className="font-title text-3xl font-bold text-white mb-2">Rifas Los Andes</h2>
+          <p className="text-gray-400 max-w-md mx-auto">
+            Tu oportunidad de ganar un Toyota Corolla 2020 SE por solo $30 USD.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left mb-8">
+          <div className="mx-auto">
+            <h3 className="font-title text-xl font-semibold text-white mb-4">Enlaces Rápidos</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="#tickets" className="text-white hover:text-red-200 transition-colors">
-                  Números disponibles
-                </Link>
-              </li>
-              <li>
-                <Link href="#payment-methods" className="text-white hover:text-red-200 transition-colors">
-                  Métodos de pago
-                </Link>
-              </li>
-              <li>
-                <Link href="#faq" className="text-white hover:text-red-200 transition-colors">
-                  Preguntas frecuentes
-                </Link>
-              </li>
+              <li><Link href="#tickets" className="hover:text-yellow-400 transition-colors">Números Disponibles</Link></li>
+              <li><Link href="#payment-methods" className="hover:text-yellow-400 transition-colors">Métodos de Pago</Link></li>
+              <li><Link href="#faq" className="hover:text-yellow-400 transition-colors">Preguntas Frecuentes</Link></li>
             </ul>
           </div>
-          
-          <div>
-            <h4 className="font-title text-lg font-bold mb-4 uppercase">Contacto</h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <a href="mailto:info@rifalosandes.com" className="text-white hover:text-red-200 transition-colors">info@rifalosandes.com</a>
+          <div className="mx-auto">
+            <h3 className="font-title text-xl font-semibold text-white mb-4">Contacto</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center justify-center md:justify-start gap-3">
+                <FaEnvelope className="text-yellow-500" />
+                <a href="mailto:info@rifalosandes.com" className="hover:text-yellow-400 transition-colors">info@rifalosandes.com</a>
               </li>
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                <a href="https://wa.me/PHONE_NUMBER_HERE" className="text-white hover:text-red-200 transition-colors">WhatsApp</a>
+              <li className="flex items-center justify-center md:justify-start gap-3">
+                <FaWhatsapp className="text-yellow-500" />
+                <a href="https://wa.me/PHONE_NUMBER_HERE" className="hover:text-yellow-400 transition-colors">Contáctanos por WhatsApp</a>
               </li>
             </ul>
           </div>
         </div>
-        
-        <div className="border-t border-red-600 mt-8 pt-6 text-center text-white">
-          <p className="text-white">© {new Date().getFullYear()} Rifa Los Andes. Todos los derechos reservados.</p>
+
+        <div className="flex justify-center gap-6 mb-8">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors">
+            <FaInstagram size={28} />
+          </a>
+          <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-yellow-400 transition-colors">
+            <FaTiktok size={28} />
+          </a>
+        </div>
+
+        <div className="border-t border-gray-800 pt-6 text-center">
+          <p className="text-gray-500 text-sm">© {new Date().getFullYear()} Rifas Los Andes. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
