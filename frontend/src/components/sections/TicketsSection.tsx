@@ -139,23 +139,22 @@ const TicketsSection: React.FC<TicketsSectionProps> = ({ tickets, promotions }) 
             viewport={{ once: true }}
             className="lg:col-span-2"
           >
-            <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+            <div className="bg-gray-900 p-6 md:p-8 rounded-lg shadow-lg h-full border border-yellow-500/30">
               <motion.h3 
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 viewport={{ once: true }}
-                className="font-title text-2xl md:text-3xl text-center mb-3 tracking-tight text-gray-900 leading-none"
+                className="text-3xl md:text-4xl font-bold text-center mb-2 text-yellow-400"
               >
-                Números disponibles
+                Números Disponibles
               </motion.h3>
-              
               <motion.p
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 viewport={{ once: true }}
-                className="text-gray-600 text-center max-w-2xl mx-auto mb-4"
+                className="text-center text-gray-400 mb-8"
               >
                 Haz clic en los números que deseas comprar
               </motion.p>
