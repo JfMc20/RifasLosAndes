@@ -104,7 +104,7 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
           <button 
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 bg-yellow-500 text-white rounded-md disabled:opacity-50 hover:bg-yellow-600 transition-all duration-200 shadow-sm"
+            className="px-3 py-1 bg-gray-800 text-yellow-500 rounded-md disabled:opacity-50 hover:bg-gray-700 transition-all duration-200 shadow-sm disabled:text-gray-500"
           >
             &laquo;
           </button>
@@ -128,8 +128,8 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
                   key={pageToShow}
                   onClick={() => handlePageChange(pageToShow)}
                   className={`mx-1 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${pageToShow === currentPage 
-                    ? 'bg-yellow-500 text-white font-bold shadow-sm' 
-                    : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                    ? 'bg-yellow-500 text-gray-900 font-bold shadow-md shadow-yellow-500/20' 
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
                 >
                   {pageToShow}
                 </button>
@@ -138,10 +138,10 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
             
             {totalPages > 5 && currentPage < totalPages - 2 && (
               <>
-                <span className="mx-1">...</span>
+                <span className="mx-1 text-gray-400">...</span>
                 <button
                   onClick={() => handlePageChange(totalPages)}
-                  className="mx-1 w-8 h-8 rounded-full flex items-center justify-center bg-white text-gray-700 hover:bg-gray-100 hover:text-yellow-500 transition-all duration-200"
+                  className="mx-1 w-8 h-8 rounded-full flex items-center justify-center bg-gray-800 text-gray-300 hover:bg-gray-700 transition-all duration-200"
                 >
                   {totalPages}
                 </button>
@@ -152,7 +152,7 @@ const TicketGrid: React.FC<TicketGridProps> = ({ tickets, onSelectTicket, select
           <button 
             onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 bg-yellow-500 text-white rounded-md disabled:opacity-50 hover:bg-yellow-600 transition-all duration-200 shadow-sm"
+            className="px-3 py-1 bg-gray-800 text-yellow-500 rounded-md disabled:opacity-50 hover:bg-gray-700 transition-all duration-200 shadow-sm disabled:text-gray-500"
           >
             &raquo;
           </button>
