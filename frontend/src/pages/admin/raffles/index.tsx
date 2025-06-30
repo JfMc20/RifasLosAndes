@@ -8,12 +8,23 @@ import { TicketService } from '../../../services/ticket.service';
 import { AuthService } from '../../../services/auth.service';
 import { Raffle } from '../../../types';
 import ActionButtons from '../../../components/admin/common/ActionButtons';
+import { NotificationService } from '../../../services/notification.service';
+import ConfirmationModal from '../../../components/admin/common/ConfirmationModal'; // Importar ConfirmationModal
 
 const RafflesPage: React.FC = () => {
   const router = useRouter();
   const [raffles, setRaffles] = useState<Raffle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Para carga general de la página
+  const [isProcessing, setIsProcessing] = useState(false); // Para acciones específicas como eliminar/inicializar
   const [error, setError] = useState('');
+
+  // Estado para el modal de confirmación
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState<{ title: string; message: string; onConfirm: () => void; confirmText?: string; confirmButtonColor?: string; }>({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   useEffect(() => {
     // Verificar autenticación
@@ -63,47 +74,57 @@ const RafflesPage: React.FC = () => {
   };
 
   // Función para eliminar una rifa
-  const deleteRaffle = async (id: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta rifa? Esta acción no se puede deshacer.')) {
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      await RaffleService.deleteRaffle(id);
-      // Actualizar la lista de rifas eliminando la borrada
-      setRaffles(raffles.filter((r) => r._id !== id));
-      setLoading(false);
-      alert('Rifa eliminada correctamente');
-    } catch (err) {
-      console.error('Error al eliminar la rifa:', err);
-      setError('No se pudo eliminar la rifa. Por favor, intenta nuevamente.');
-      setLoading(false);
-    }
+  const handleDeleteRaffle = (id: string) => {
+    setModalContent({
+      title: 'Confirmar Eliminación',
+      message: '¿Estás seguro de que deseas eliminar esta rifa? Esta acción no se puede deshacer y también eliminará todos los boletos asociados.',
+      confirmText: 'Eliminar Rifa',
+      confirmButtonColor: 'bg-brand-danger hover:bg-brand-danger-dark',
+      onConfirm: async () => {
+        setIsModalOpen(false);
+        setIsProcessing(true);
+        try {
+          await RaffleService.deleteRaffle(id);
+          setRaffles(raffles.filter((r) => r._id !== id));
+          NotificationService.success('Rifa eliminada correctamente');
+        } catch (err) {
+          console.error('Error al eliminar la rifa:', err);
+          NotificationService.error('No se pudo eliminar la rifa. Por favor, intenta nuevamente.');
+          // Considerar si setError es necesario aquí o si el toast es suficiente
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+    });
+    setIsModalOpen(true);
   };
 
-  const initializeTickets = async (raffleId: string) => {
-    if (!confirm('¿Estás seguro de que deseas inicializar los boletos para esta rifa? Si ya existen boletos, serán eliminados y recreados.')) {
-      return;
-    }
-    
-    try {
-      setLoading(true); // Mostrar loading mientras se inicializan
-      const result = await TicketService.initializeTickets(raffleId);
-      alert(`Boletos inicializados correctamente: ${result.message}`);
-      setLoading(false);
-    } catch (err: any) {
-      console.error('Error al inicializar boletos:', err);
-      
-      // Si el error es de clave duplicada, mostrar un mensaje más específico
-      if (err?.response?.data?.message?.includes('duplicate key error') || 
-          err?.response?.data?.message?.includes('E11000')) {
-        alert('Error: Ya existen boletos para esta rifa. El sistema intentará eliminarlos y crearlos nuevamente. Por favor intenta nuevamente.');
-      } else {
-        alert(`No se pudieron inicializar los boletos: ${err?.response?.data?.message || 'Error desconocido'}`);
-      }
-      setLoading(false);
-    }
+  const handleInitializeTickets = (raffleId: string, raffleName: string) => {
+    setModalContent({
+      title: `Inicializar Boletos para "${raffleName}"`,
+      message: '¿Estás seguro de que deseas inicializar los boletos para esta rifa? Si ya existen boletos, serán eliminados y recreados. Esta acción es irreversible.',
+      confirmText: 'Sí, Inicializar Boletos',
+      confirmButtonColor: 'bg-yellow-500 hover:bg-yellow-600',
+      onConfirm: async () => {
+        setIsModalOpen(false);
+        setIsProcessing(true);
+        try {
+          const result = await TicketService.initializeTickets(raffleId);
+          NotificationService.success(`Boletos inicializados para "${raffleName}"`, result.message);
+        } catch (err: any) {
+          console.error('Error al inicializar boletos:', err);
+          if (err?.response?.data?.message?.includes('duplicate key error') ||
+              err?.response?.data?.message?.includes('E11000')) {
+            NotificationService.error('Error: Ya existen boletos para esta rifa.', 'El sistema intentó eliminarlos y crearlos nuevamente sin éxito. Contacte a soporte si el problema persiste.');
+          } else {
+            NotificationService.error('No se pudieron inicializar los boletos', err?.response?.data?.message || 'Error desconocido');
+          }
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+    });
+    setIsModalOpen(true);
   };
 
   return (
@@ -167,8 +188,8 @@ const RafflesPage: React.FC = () => {
                       <Link href={`/admin/raffles/${raffle._id}`} legacyBehavior><a className="px-3 py-1 rounded-md bg-brand-accent/20 text-brand-accent font-bold hover:bg-brand-accent/30 transition">Ver</a></Link>
                       <Link href={`/admin/raffles/${raffle._id}/edit`} legacyBehavior><a className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-500 font-bold hover:bg-blue-500/30 transition">Editar</a></Link>
                       <button onClick={() => toggleRaffleStatus(raffle)} className={`px-3 py-1 rounded-md font-bold transition ${raffle.isActive ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-green-500/20 text-green-500 hover:bg-green-500/30'}`}>{raffle.isActive ? 'Desactivar' : 'Activar'}</button>
-                      <button onClick={() => initializeTickets(raffle._id)} className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-500 font-bold hover:bg-yellow-500/30 transition">Init. Boletos</button>
-                      <button onClick={() => deleteRaffle(raffle._id)} className="px-3 py-1 rounded-md bg-brand-danger/20 text-brand-danger font-bold hover:bg-brand-danger/30 transition">Eliminar</button>
+                      <button onClick={() => handleInitializeTickets(raffle._id, raffle.name)} className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-500 font-bold hover:bg-yellow-500/30 transition">Init. Boletos</button>
+                      <button onClick={() => handleDeleteRaffle(raffle._id)} className="px-3 py-1 rounded-md bg-brand-danger/20 text-brand-danger font-bold hover:bg-brand-danger/30 transition">Eliminar</button>
                     </td>
                   </tr>
                 ))}
@@ -176,6 +197,16 @@ const RafflesPage: React.FC = () => {
             </table>
           </div>
         )}
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          onConfirm={modalContent.onConfirm}
+          onCancel={() => setIsModalOpen(false)}
+          confirmText={modalContent.confirmText}
+          confirmButtonColor={modalContent.confirmButtonColor}
+          isConfirming={isProcessing}
+        />
       </AdminLayout>
     </>
   );

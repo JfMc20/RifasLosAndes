@@ -7,13 +7,24 @@ import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../types';
 import ActionButtons from '../../../components/admin/common/ActionButtons';
 import { formatDate } from '../../../utils/formatters';
+import { NotificationService } from '../../../services/notification.service';
+import ConfirmationModal from '../../../components/admin/common/ConfirmationModal'; // Importar ConfirmationModal
 
 const UsersPage: React.FC = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false); // Para el modal
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  // Estado para el modal de confirmación
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState<{ title: string; message: string; onConfirm: () => void; confirmText?: string; confirmButtonColor?: string; userName?: string; }>({ // Añadido userName opcional
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   // Verificar autenticación
   useEffect(() => {
@@ -76,22 +87,33 @@ const UsersPage: React.FC = () => {
   const handleDeleteUser = async (userId: string) => {
     // Evitar que un usuario se elimine a sí mismo
     if (currentUser && userId === currentUser._id) {
-      alert('No puedes eliminar tu propio usuario');
+      NotificationService.warning('No puedes eliminar tu propio usuario.');
       return;
     }
 
-    if (!confirm('¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
-      return;
-    }
+    const userToDelete = users.find(u => u._id === userId);
 
-    try {
-      await UserService.deleteUser(userId);
-      // Actualizar la lista de usuarios
-      setUsers(users.filter(user => user._id !== userId));
-    } catch (err: any) {
-      console.error('Error al eliminar usuario:', err);
-      alert(err.response?.data?.message || 'Error al eliminar el usuario');
-    }
+    setModalContent({
+      title: 'Confirmar Eliminación de Usuario',
+      message: `¿Estás seguro de que quieres eliminar al usuario "${userToDelete?.name || userToDelete?.username}"? Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar Usuario',
+      confirmButtonColor: 'bg-brand-danger hover:bg-brand-danger-dark',
+      onConfirm: async () => {
+        setIsModalOpen(false);
+        setIsProcessing(true);
+        try {
+          await UserService.deleteUser(userId);
+          setUsers(users.filter(user => user._id !== userId));
+          NotificationService.success('Usuario eliminado correctamente.');
+        } catch (err: any) {
+          console.error('Error al eliminar usuario:', err);
+          NotificationService.error(err.response?.data?.message || 'Error al eliminar el usuario.');
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+    });
+    setIsModalOpen(true);
   };
 
   // Formato de fecha
@@ -245,6 +267,16 @@ const UsersPage: React.FC = () => {
             </table>
           </div>
         )}
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          onConfirm={modalContent.onConfirm}
+          onCancel={() => setIsModalOpen(false)}
+          confirmText={modalContent.confirmText}
+          confirmButtonColor={modalContent.confirmButtonColor}
+          isConfirming={isProcessing}
+        />
       </AdminLayout>
     </>
   );

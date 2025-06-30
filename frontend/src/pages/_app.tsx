@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import Head from 'next/head';
 import { useEffect } from 'react';
 import { preloadSiteImages } from '@/utils/imagePreloader';
+import { Toaster } from 'sonner'; // Importar Toaster
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -57,6 +58,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <main className={`${inter.className} overflow-x-hidden w-full max-w-full`}>
         <Component {...pageProps} />
+        <Toaster richColors position="bottom-right" /> {/* Añadir Toaster aquí */}
       </main>
     </>
   );
