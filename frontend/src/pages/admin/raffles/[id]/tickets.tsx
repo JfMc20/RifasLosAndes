@@ -9,7 +9,8 @@ import { useTickets } from '../../../../hooks/useTickets';
 import TicketFilters from '../../../../components/admin/tickets/TicketFilters';
 import TicketActions from '../../../../components/admin/tickets/TicketActions';
 import TicketsTable from '../../../../components/admin/tickets/TicketsTable';
-import TicketPagination from '../../../../components/admin/tickets/TicketPagination';
+// import TicketPagination from '../../../../components/admin/tickets/TicketPagination'; // Reemplazado
+import Pagination from '../../../../components/admin/common/Pagination'; // Usar el genérico
 import SaleModal from '../../../../components/admin/tickets/SaleModal';
 
 const TicketsPage: React.FC = () => {
@@ -120,17 +121,16 @@ const TicketsPage: React.FC = () => {
             />
             
             {/* Paginación */}
-            <TicketPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalTickets={currentTickets.length}
-              ticketsPerPage={100}
-              indexOfFirstTicket={indexOfFirstTicket}
-              indexOfLastTicket={indexOfLastTicket}
-              paginate={paginate}
-              prevPage={prevPage}
-              nextPage={nextPage}
-            />
+            { totalPages > 0 && currentTickets.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={paginate}
+                totalItems={totalItems} // Prop directamente del hook useTickets
+                itemsPerPage={ticketsPerPage} // Prop directamente del hook useTickets
+                itemName="boletos"
+              />
+            )}
             
             {/* Modal para completar venta */}
             <SaleModal

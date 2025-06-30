@@ -8,19 +8,29 @@ import { User } from '../../../types';
 import ActionButtons from '../../../components/admin/common/ActionButtons';
 import { formatDate } from '../../../utils/formatters';
 import { NotificationService } from '../../../services/notification.service';
-import ConfirmationModal from '../../../components/admin/common/ConfirmationModal'; // Importar ConfirmationModal
+import ConfirmationModal from '../../../components/admin/common/ConfirmationModal';
+import Pagination from '../../../components/admin/common/Pagination'; // Importar Pagination
+
+const USERS_PER_PAGE = 10; // O el valor que prefieras
 
 const UsersPage: React.FC = () => {
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  // const [allUsers, setAllUsers] = useState<User[]>([]); // Ya no es necesario con paginación backend
+  const [displayedUsers, setDisplayedUsers] = useState<User[]>([]); // Para la página actual
+
   const [loading, setLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false); // Para el modal
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  // Estado de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+
   // Estado para el modal de confirmación
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<{ title: string; message: string; onConfirm: () => void; confirmText?: string; confirmButtonColor?: string; userName?: string; }>({ // Añadido userName opcional
+  const [modalContent, setModalContent] = useState<{ title: string; message: string; onConfirm: () => void; confirmText?: string; confirmButtonColor?: string; userName?: string; }>({
     title: '',
     message: '',
     onConfirm: () => {},
@@ -33,65 +43,72 @@ const UsersPage: React.FC = () => {
       return;
     }
 
-    const fetchData = async () => {
+    const fetchUsersData = async (pageToFetch: number) => {
+      setLoading(true);
+      setError('');
       try {
-        setLoading(true);
-        setError('');
-
-        // Obtener perfil del usuario actual
-        const userProfile = AuthService.getCurrentUser();
-        if (userProfile && '_id' in userProfile) {
-          setCurrentUser(userProfile as User);
-        } else {
-          // If the user profile doesn't match the expected structure, try to get it from API
-          try {
-            const apiUserProfile = await AuthService.getProfile();
-            setCurrentUser(apiUserProfile);
-          } catch (error) {
-            console.error('Error getting user profile:', error);
-            setError('Error al obtener el perfil de usuario');
-            setLoading(false);
-            return;
+        // Primero, asegurar que tenemos el perfil del usuario actual y que es admin
+        // Esta lógica de perfil podría optimizarse para no correr en cada carga de página si ya se tiene.
+        let currentAdminUser = currentUser;
+        if (!currentAdminUser) {
+          const userProfile = AuthService.getCurrentUser();
+          if (userProfile && '_id' in userProfile) {
+            currentAdminUser = userProfile as User;
+            setCurrentUser(currentAdminUser);
+          } else {
+            currentAdminUser = await AuthService.getProfile();
+            setCurrentUser(currentAdminUser);
           }
         }
 
-        // Verificar si es admin
-        const currentUserProfile = AuthService.getCurrentUser();
-        if (!currentUserProfile || currentUserProfile.role !== 'admin') {
-          setError('No tienes permisos para ver esta página');
+        if (!currentAdminUser || currentAdminUser.role !== 'admin') {
+          setError('No tienes permisos para ver esta página.');
+          setDisplayedUsers([]);
+          setTotalUsers(0);
+          setTotalPages(0);
           setLoading(false);
           return;
         }
 
-        // Obtener todos los usuarios
-        const usersData = await UserService.getAllUsers();
-        // Ensure we have an array of users
-        if (Array.isArray(usersData)) {
-          setUsers(usersData);
-        } else {
-          // If we don't get an array (like in demo mode), set an empty array
-          console.warn('Expected array of users but got:', usersData);
-          setUsers([]);
-        }
-        setLoading(false);
+        const response = await UserService.getAllUsers(pageToFetch, USERS_PER_PAGE);
+        setDisplayedUsers(response.data);
+        setTotalUsers(response.totalItems);
+        setTotalPages(response.totalPages);
+        setCurrentPage(response.currentPage);
+
       } catch (err: any) {
         console.error('Error al cargar usuarios:', err);
-        setError(err.response?.data?.message || 'Error al cargar los usuarios');
+        setError(err.response?.data?.message || 'Error al cargar los usuarios.');
+        setDisplayedUsers([]);
+        setTotalUsers(0);
+        setTotalPages(0);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [router]);
+    fetchUsersData(currentPage);
+  }, [router, currentPage, currentUser]); // currentUser añadido como dependencia
 
-  const handleDeleteUser = async (userId: string) => {
-    // Evitar que un usuario se elimine a sí mismo
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber !== currentPage) {
+      setCurrentPage(pageNumber); // Dispara useEffect
+      window.scrollTo(0, 0);
+    }
+  };
+
+  // Refresca los datos de la página actual
+  const refreshCurrentPageData = () => {
+    fetchUsersData(currentPage);
+  };
+
+  const handleDeleteUser = (userId: string) => {
     if (currentUser && userId === currentUser._id) {
       NotificationService.warning('No puedes eliminar tu propio usuario.');
       return;
     }
 
-    const userToDelete = users.find(u => u._id === userId);
+    const userToDelete = displayedUsers.find(u => u._id === userId); // Buscar en displayedUsers
 
     setModalContent({
       title: 'Confirmar Eliminación de Usuario',
@@ -103,8 +120,13 @@ const UsersPage: React.FC = () => {
         setIsProcessing(true);
         try {
           await UserService.deleteUser(userId);
-          setUsers(users.filter(user => user._id !== userId));
           NotificationService.success('Usuario eliminado correctamente.');
+          // Volver a cargar los datos para la página actual o la anterior si la actual queda vacía
+          if (displayedUsers.length === 1 && currentPage > 1) {
+            setCurrentPage(currentPage - 1); // Esto disparará el useEffect
+          } else {
+            fetchUsersData(currentPage); // Recargar página actual
+          }
         } catch (err: any) {
           console.error('Error al eliminar usuario:', err);
           NotificationService.error(err.response?.data?.message || 'Error al eliminar el usuario.');
@@ -186,14 +208,20 @@ const UsersPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.length === 0 ? (
+                {displayedUsers.length === 0 && !loading ? ( // Modificado para displayedUsers y !loading
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                      No hay usuarios registrados.
+                    <td colSpan={5} className="px-6 py-16 text-center text-gray-500"> {/* Aumentado py */}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <h3 className="mt-2 text-lg font-medium text-ui-text-primary">No hay usuarios</h3>
+                      <p className="mt-1 text-sm text-ui-text-secondary">
+                        {totalUsers > 0 ? 'Intenta ajustar la página o filtros.' : 'Crea el primer usuario del sistema.'}
+                      </p>
                     </td>
                   </tr>
                 ) : (
-                  users.map((user) => (
+                  displayedUsers.map((user) => (
                     <tr key={user._id} className="hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-6 py-5 whitespace-nowrap">
                         <div className="flex items-center">
@@ -266,6 +294,16 @@ const UsersPage: React.FC = () => {
               </tbody>
             </table>
           </div>
+        )}
+        {!loading && totalPages > 0 && displayedUsers.length > 0 && ( // Solo mostrar paginación si hay datos y más de una página
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                totalItems={totalUsers}
+                itemsPerPage={USERS_PER_PAGE}
+                itemName="usuarios"
+            />
         )}
         <ConfirmationModal
           isOpen={isModalOpen}

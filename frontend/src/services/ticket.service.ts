@@ -1,5 +1,5 @@
 import { ApiService } from './api';
-import { Ticket, TicketStatus } from '../types';
+import { Ticket, TicketStatus, PaginatedResponse } from '../types'; // Añadir PaginatedResponse
 
 export interface TicketStatusSummary {
   [TicketStatus.AVAILABLE]: number;
@@ -57,21 +57,20 @@ export class TicketService {
   }
 
   /**
-   * Obtiene todos los boletos de una rifa (para panel admin)
+   * Obtiene todos los boletos de una rifa (para panel admin) de forma paginada.
    */
-  static async getAllTickets(raffleId: string): Promise<Ticket[]> {
+  static async getAllTickets(raffleId: string, page: number = 1, limit: number = 100): Promise<PaginatedResponse<Ticket>> {
     try {
-      const response = await ApiService.get<Ticket[]>(`ticket/raffle/${raffleId}`);
-      // Ensure we have an array of tickets
-      if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        console.warn('Expected array of tickets but got:', response.data);
-        return [];
-      }
+      const response = await ApiService.get<PaginatedResponse<Ticket>>(`ticket/raffle/${raffleId}?page=${page}&limit=${limit}`);
+      return response.data;
     } catch (error) {
-      console.error('Error fetching all tickets:', error);
-      throw error;
+      console.error(`Error fetching tickets for raffle ${raffleId}:`, error);
+      return {
+        data: [],
+        currentPage: 1,
+        totalPages: 0,
+        totalItems: 0,
+      };
     }
   }
 

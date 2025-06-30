@@ -4,14 +4,46 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../common/schemas/user.schema';
 
+// Interfaz para la respuesta paginada de usuarios (sin password)
+export interface PaginatedUserResponse {
+  data: Omit<User, 'password'>[]; // Aseguramos que no se incluya el password
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+}
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<User[]> { // Podría ser deprecada o para uso interno
     return this.userModel.find().select('-password').exec();
+  }
+
+  async findAllPaginated(page: number, limit: number): Promise<PaginatedUserResponse> {
+    const skip = (page - 1) * limit;
+    // Asumimos que no hay filtros complejos para el conteo total de usuarios para un admin
+    const totalItems = await this.userModel.countDocuments().exec();
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const data = await this.userModel.find()
+      .select('-password') // Excluir contraseña
+      .sort({ username: 1 }) // Ordenar por nombre de usuario, por ejemplo
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    return {
+      data: data.map(user => { // Mapear para asegurar el tipo Omit<User, 'password'> si es necesario
+        const { password, ...userWithoutPassword } = user.toObject(); // .toObject() para plain JS object
+        return userWithoutPassword;
+      }),
+      currentPage: page,
+      totalPages,
+      totalItems
+    };
   }
 
   async findById(id: string): Promise<User> {

@@ -9,14 +9,24 @@ import { AuthService } from '../../../services/auth.service';
 import { Raffle } from '../../../types';
 import ActionButtons from '../../../components/admin/common/ActionButtons';
 import { NotificationService } from '../../../services/notification.service';
-import ConfirmationModal from '../../../components/admin/common/ConfirmationModal'; // Importar ConfirmationModal
+import ConfirmationModal from '../../../components/admin/common/ConfirmationModal';
+import Pagination from '../../../components/admin/common/Pagination'; // Importar Pagination
+
+const RAFFLES_PER_PAGE = 10; // O el valor que prefieras
 
 const RafflesPage: React.FC = () => {
   const router = useRouter();
-  const [raffles, setRaffles] = useState<Raffle[]>([]);
-  const [loading, setLoading] = useState(true); // Para carga general de la página
-  const [isProcessing, setIsProcessing] = useState(false); // Para acciones específicas como eliminar/inicializar
+  // const [allRaffles, setAllRaffles] = useState<Raffle[]>([]); // Ya no es necesario si el backend pagina
+  const [displayedRaffles, setDisplayedRaffles] = useState<Raffle[]>([]); // Rifas para la página actual
+
+  const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false); // Para acciones individuales, no para carga de página
   const [error, setError] = useState('');
+
+  // Estado de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRaffles, setTotalRaffles] = useState(0);
 
   // Estado para el modal de confirmación
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,43 +43,58 @@ const RafflesPage: React.FC = () => {
       return;
     }
 
-    const fetchRaffles = async () => {
+    const fetchRafflesData = async (pageToFetch: number) => {
+      setLoading(true);
+      setError('');
       try {
-        setLoading(true);
-        const response = await RaffleService.getAllRaffles();
-        // Ensure we have an array of raffles
-        if (Array.isArray(response)) {
-          setRaffles(response);
-        } else {
-          // If we don't get an array (like in demo mode), set an empty array
-          console.warn('Expected array of raffles but got:', response);
-          setRaffles([]);
-        }
-        setLoading(false);
+        const response = await RaffleService.getAllRaffles(pageToFetch, RAFFLES_PER_PAGE);
+        setDisplayedRaffles(response.data);
+        setTotalRaffles(response.totalItems);
+        setTotalPages(response.totalPages);
+        setCurrentPage(response.currentPage);
       } catch (err) {
         console.error('Error al cargar rifas:', err);
         setError('No se pudieron cargar las rifas. Por favor, intenta nuevamente.');
+        // Mantener datos anteriores o limpiar? Por ahora limpiamos.
+        setDisplayedRaffles([]);
+        setTotalRaffles(0);
+        setTotalPages(0);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchRaffles();
-  }, [router]);
+    fetchRafflesData(currentPage);
+  }, [router, currentPage]);
+
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber !== currentPage) {
+      setCurrentPage(pageNumber); // Esto disparará el useEffect para cargar nuevos datos
+      window.scrollTo(0, 0);
+    }
+  };
+
+  // Refresca los datos de la página actual (ej. después de una actualización)
+  const refreshCurrentPageData = () => {
+    fetchRafflesData(currentPage);
+  };
 
   const toggleRaffleStatus = async (raffle: Raffle) => {
     try {
-      await RaffleService.updateRaffle(raffle._id, {
+      setIsProcessing(true);
+      const updatedRaffle = await RaffleService.updateRaffle(raffle._id, {
         ...raffle,
         isActive: !raffle.isActive
       });
-      
-      // Actualizar la lista de rifas
-      setRaffles(raffles.map((r) => 
-        r._id === raffle._id ? { ...r, isActive: !r.isActive } : r
-      ));
+      // Actualizar solo el item modificado en displayedRaffles si aún está en la página actual
+      // O mejor, recargar los datos de la página actual para consistencia.
+      refreshCurrentPageData();
+      NotificationService.success(`Rifa "${updatedRaffle.name}" ${updatedRaffle.isActive ? 'activada' : 'desactivada'}.`);
     } catch (err) {
       console.error('Error al actualizar estado de rifa:', err);
-      setError('No se pudo actualizar el estado de la rifa.');
+      NotificationService.error('No se pudo actualizar el estado de la rifa.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -85,12 +110,16 @@ const RafflesPage: React.FC = () => {
         setIsProcessing(true);
         try {
           await RaffleService.deleteRaffle(id);
-          setRaffles(raffles.filter((r) => r._id !== id));
           NotificationService.success('Rifa eliminada correctamente');
+          // Volver a cargar los datos para la página actual o la anterior si la actual queda vacía
+          if (displayedRaffles.length === 1 && currentPage > 1) {
+            setCurrentPage(currentPage - 1); // Esto disparará el useEffect
+          } else {
+            fetchRafflesData(currentPage); // Recargar página actual
+          }
         } catch (err) {
           console.error('Error al eliminar la rifa:', err);
           NotificationService.error('No se pudo eliminar la rifa. Por favor, intenta nuevamente.');
-          // Considerar si setError es necesario aquí o si el toast es suficiente
         } finally {
           setIsProcessing(false);
         }
@@ -159,43 +188,66 @@ const RafflesPage: React.FC = () => {
             </div>
         )}
 
-        {!loading && !error && (
-          <div className="overflow-x-auto bg-ui-surface rounded-xl shadow-lg border border-ui-border">
-            <table className="min-w-full divide-y divide-ui-border">
-              <thead className="bg-ui-background">
-                <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Nombre</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Premio</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Precio</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Total Boletos</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Estado</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="bg-ui-surface divide-y divide-ui-border">
-                {raffles.map((raffle) => (
-                  <tr key={raffle._id} className="hover:bg-ui-background transition-colors duration-200">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-ui-text-primary">{raffle.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.prize}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">${raffle.ticketPrice}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.totalTickets}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${raffle.isActive ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                        {raffle.isActive ? 'Activa' : 'Inactiva'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <Link href={`/admin/raffles/${raffle._id}`} legacyBehavior><a className="px-3 py-1 rounded-md bg-brand-accent/20 text-brand-accent font-bold hover:bg-brand-accent/30 transition">Ver</a></Link>
-                      <Link href={`/admin/raffles/${raffle._id}/edit`} legacyBehavior><a className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-500 font-bold hover:bg-blue-500/30 transition">Editar</a></Link>
-                      <button onClick={() => toggleRaffleStatus(raffle)} className={`px-3 py-1 rounded-md font-bold transition ${raffle.isActive ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-green-500/20 text-green-500 hover:bg-green-500/30'}`}>{raffle.isActive ? 'Desactivar' : 'Activar'}</button>
-                      <button onClick={() => handleInitializeTickets(raffle._id, raffle.name)} className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-500 font-bold hover:bg-yellow-500/30 transition">Init. Boletos</button>
-                      <button onClick={() => handleDeleteRaffle(raffle._id)} className="px-3 py-1 rounded-md bg-brand-danger/20 text-brand-danger font-bold hover:bg-brand-danger/30 transition">Eliminar</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {!loading && !error && displayedRaffles.length === 0 && (
+           <div className="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19V8.5a1.5 1.5 0 00-3 0V19m0 0h-2m2 0h2M9 19V8.5a1.5 1.5 0 00-3 0V19m0 0h-2m2 0h2" /> {/* Icono más representativo */}
+            </svg>
+            <h3 className="mt-2 text-lg font-medium text-ui-text-primary">No hay rifas creadas</h3>
+            <p className="mt-1 text-sm text-ui-text-secondary">
+              Empieza creando tu primera rifa.
+            </p>
           </div>
+        )}
+
+        {!loading && !error && displayedRaffles.length > 0 && (
+          <>
+            <div className="overflow-x-auto bg-ui-surface rounded-xl shadow-lg border border-ui-border">
+              <table className="min-w-full divide-y divide-ui-border">
+                <thead className="bg-ui-background">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Nombre</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Premio</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Precio</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Total Boletos</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Estado</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-ui-surface divide-y divide-ui-border">
+                  {displayedRaffles.map((raffle) => (
+                    <tr key={raffle._id} className="hover:bg-ui-background transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-ui-text-primary">{raffle.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.prize}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">${raffle.ticketPrice}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.totalTickets}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${raffle.isActive ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                          {raffle.isActive ? 'Activa' : 'Inactiva'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <Link href={`/admin/raffles/${raffle._id}`} legacyBehavior><a className="px-3 py-1 rounded-md bg-brand-accent/20 text-brand-accent font-bold hover:bg-brand-accent/30 transition">Ver</a></Link>
+                        <Link href={`/admin/raffles/${raffle._id}/edit`} legacyBehavior><a className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-500 font-bold hover:bg-blue-500/30 transition">Editar</a></Link>
+                        <button onClick={() => toggleRaffleStatus(raffle)} className={`px-3 py-1 rounded-md font-bold transition ${raffle.isActive ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-green-500/20 text-green-500 hover:bg-green-500/30'}`}>{raffle.isActive ? 'Desactivar' : 'Activar'}</button>
+                        <button onClick={() => handleInitializeTickets(raffle._id, raffle.name)} className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-500 font-bold hover:bg-yellow-500/30 transition">Init. Boletos</button>
+                        <button onClick={() => handleDeleteRaffle(raffle._id)} className="px-3 py-1 rounded-md bg-brand-danger/20 text-brand-danger font-bold hover:bg-brand-danger/30 transition">Eliminar</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={totalRaffles}
+              itemsPerPage={RAFFLES_PER_PAGE}
+              itemName="rifas"
+            />
+          </>
         )}
         <ConfirmationModal
           isOpen={isModalOpen}

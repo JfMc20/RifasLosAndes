@@ -1,5 +1,5 @@
 import { ApiService } from './api';
-import { User } from '../types';
+import { User, PaginatedResponse } from '../types'; // Añadir PaginatedResponse
 
 // Interfaz específica para el registro de usuarios
 interface RegisterUserDto {
@@ -20,15 +20,23 @@ interface AuthResponse {
  */
 export class UserService {
   /**
-   * Obtiene todos los usuarios
+   * Obtiene todos los usuarios de forma paginada
    */
-  static async getAllUsers(): Promise<User[]> {
+  static async getAllUsers(page: number = 1, limit: number = 10): Promise<PaginatedResponse<User>> {
     try {
-      const response = await ApiService.get<User[]>('/users');
-      return response.data;
+      // Asumimos que el backend ahora devuelve Omit<User, 'password'> en la data
+      const response = await ApiService.get<PaginatedResponse<Omit<User, 'password'>>>(`/users?page=${page}&limit=${limit}`);
+      // El tipo User en frontend ya es Omit<User, 'password'> implícitamente porque no la usamos.
+      // Si User en frontend incluyera password, necesitaríamos un mapeo aquí.
+      return response.data as PaginatedResponse<User>;
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
-      return [];
+      return {
+        data: [],
+        currentPage: 1,
+        totalPages: 0,
+        totalItems: 0,
+      };
     }
   }
 

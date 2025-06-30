@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Put, UseGuards } from '@nestjs/common';
-import { TicketService } from './ticket.service';
+import { Controller, Get, Post, Body, Param, Put, UseGuards, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
+import { TicketService, PaginatedTicketResponse } from './ticket.service'; // Importar PaginatedTicketResponse
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { TicketStatus } from '../../common/schemas/ticket.schema';
 import { UpdateMultipleTicketsStatusDto } from '../../common/dto/ticket.dto';
@@ -36,8 +36,13 @@ export class TicketController {
 
   @UseGuards(JwtAuthGuard)
   @Get('raffle/:raffleId')
-  async getAllTickets(@Param('raffleId') raffleId: string) {
-    return this.ticketService.findTicketsByRaffle(raffleId);
+  async getAllTickets(
+    @Param('raffleId') raffleId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(100), ParseIntPipe) limit: number, // Default más alto para tickets
+  ): Promise<PaginatedTicketResponse> {
+    const safeLimit = Math.min(limit, 500); // Límite máximo aún más alto para tickets si es necesario
+    return this.ticketService.findTicketsByRafflePaginated(raffleId, page, safeLimit);
   }
 
   @UseGuards(JwtAuthGuard)

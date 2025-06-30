@@ -3,7 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Ticket, TicketStatus } from '../../common/schemas/ticket.schema';
 import { Raffle } from '../../common/schemas/raffle.schema';
-import { CreateTicketDto, UpdateTicketDto, UpdateMultipleTicketsStatusDto } from '../../common/dto/ticket.dto';
+// CreateTicketDto, UpdateTicketDto, UpdateMultipleTicketsStatusDto no se usan directamente aquí para paginación, pero se mantienen por si acaso.
+
+// Interfaz para la respuesta paginada de tickets
+export interface PaginatedTicketResponse {
+  data: Ticket[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+}
 
 @Injectable()
 export class TicketService {
@@ -162,7 +170,7 @@ export class TicketService {
   }
 
   // Get all tickets by raffle
-  async findTicketsByRaffle(raffleId: string) {
+  async findTicketsByRaffle(raffleId: string) { // Podría ser deprecada o para uso interno
     const raffle = await this.raffleModel.findById(raffleId).exec();
     
     if (!raffle) {
@@ -171,8 +179,28 @@ export class TicketService {
     
     return this.ticketModel
       .find({ raffle: raffleId })
-      .sort({ number: 1 })
+      .sort({ number: 1 }) // Ordenar por número de ticket
       .exec();
+  }
+
+  async findTicketsByRafflePaginated(raffleId: string, page: number, limit: number): Promise<PaginatedTicketResponse> {
+    const raffle = await this.raffleModel.findById(raffleId).exec();
+    if (!raffle) {
+      throw new NotFoundException(`Raffle with ID ${raffleId} not found`);
+    }
+
+    const skip = (page - 1) * limit;
+    const filter = { raffle: raffleId };
+    const totalItems = await this.ticketModel.countDocuments(filter).exec();
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const data = await this.ticketModel.find(filter)
+      .sort({ number: 1 }) // Ordenar por número de ticket
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    return { data, currentPage: page, totalPages, totalItems };
   }
 
   // Get ticket status summary

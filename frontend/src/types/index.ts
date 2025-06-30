@@ -151,3 +151,12 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
 }
+
+// Interface genérica para respuestas paginadas
+export interface PaginatedResponse<T> {
+  data: T[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  // itemsPerPage?: number; // Opcional, se puede calcular o venir del backend
+}

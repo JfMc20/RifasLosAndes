@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
-import { UserService } from './user.service';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, HttpException, HttpStatus, UnauthorizedException, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
+import { UserService, PaginatedUserResponse } from './user.service'; // Importar PaginatedUserResponse
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { User, UserRole } from '../../common/schemas/user.schema';
 
@@ -9,13 +9,17 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getAllUsers(@Req() req: any): Promise<User[]> {
+  async getAllUsers(
+    @Req() req: any,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<PaginatedUserResponse> {
     // Solo los administradores pueden listar todos los usuarios
     if (req.user.role !== UserRole.ADMIN) {
       throw new HttpException('No tienes permiso para realizar esta acción', HttpStatus.FORBIDDEN);
     }
-
-    return this.userService.findAll();
+    const safeLimit = Math.min(limit, 100);
+    return this.userService.findAllPaginated(page, safeLimit);
   }
 
   @Get(':id')

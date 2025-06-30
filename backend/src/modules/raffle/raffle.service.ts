@@ -12,6 +12,14 @@ export interface ActiveRaffleWithPromotions {
   promotions: Promotion[];
 }
 
+// Interfaz para la respuesta paginada
+export interface PaginatedRaffleResponse {
+  data: Raffle[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+}
+
 @Injectable()
 export class RaffleService {
   constructor(
@@ -20,12 +28,28 @@ export class RaffleService {
   ) {}
 
   // Raffle methods
-  async findAllRaffles() {
-    // Añadimos un log para depuración
-    console.log('Finding all raffles...');
+  async findAllRaffles() { // Esta podría ser deprecada o usada internamente
+    console.log('Finding all raffles (non-paginated)...');
     const raffles = await this.raffleModel.find().sort({ createdAt: -1 }).exec();
     console.log(`Found ${raffles.length} raffles`);
     return raffles;
+  }
+
+  async findAllRafflesPaginated(page: number, limit: number): Promise<PaginatedRaffleResponse> {
+    const skip = (page - 1) * limit;
+    const totalItems = await this.raffleModel.countDocuments().exec();
+    const totalPages = Math.ceil(totalItems / limit);
+
+    console.log(`Finding raffles paginated: page ${page}, limit ${limit}, skip ${skip}, totalItems ${totalItems}`);
+
+    const data = await this.raffleModel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    console.log(`Found ${data.length} raffles for page ${page}`);
+    return { data, currentPage: page, totalPages, totalItems };
   }
 
   async findActiveRaffle(): Promise<Raffle> {

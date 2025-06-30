@@ -1,5 +1,5 @@
 import { ApiService } from './api';
-import { RaffleData, Raffle, Promotion } from '../types';
+import { RaffleData, Raffle, Promotion, PaginatedResponse } from '../types'; // Añadir PaginatedResponse
 
 export class RaffleService {
   /**
@@ -19,15 +19,23 @@ export class RaffleService {
   }
 
   /**
-   * Obtiene todas las rifas (para panel admin)
+   * Obtiene todas las rifas (para panel admin) de forma paginada.
    */
-  static async getAllRaffles(): Promise<Raffle[]> {
+  static async getAllRaffles(page: number = 1, limit: number = 10): Promise<PaginatedResponse<Raffle>> {
     try {
-      const response = await ApiService.get<Raffle[]>('raffle');
+      const response = await ApiService.get<PaginatedResponse<Raffle>>(`raffle?page=${page}&limit=${limit}`);
+      // Asumimos que la respuesta del backend ya tiene el formato PaginatedResponse<Raffle>
+      // incluyendo data, currentPage, totalPages, totalItems
       return response.data;
     } catch (error) {
       console.error('Error fetching all raffles:', error);
-      throw error;
+      // Devolver una estructura de paginación vacía en caso de error para mantener la consistencia del tipo
+      return {
+        data: [],
+        currentPage: 1,
+        totalPages: 0,
+        totalItems: 0,
+      };
     }
   }
 

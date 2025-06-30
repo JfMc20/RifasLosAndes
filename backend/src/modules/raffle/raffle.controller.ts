@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
-import { RaffleService, ActiveRaffleWithPromotions } from './raffle.service';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { RaffleService, ActiveRaffleWithPromotions, PaginatedRaffleResponse } from './raffle.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CreateRaffleDto, UpdateRaffleDto } from '../../common/dto/raffle.dto';
 import { CreatePromotionDto, UpdatePromotionDto } from '../../common/dto/promotion.dto';
@@ -46,8 +46,13 @@ export class RaffleController {
   // Admin endpoints (protected)
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll() {
-    return this.raffleService.findAllRaffles();
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<PaginatedRaffleResponse> {
+    // Asegurarse de que limit no exceda un máximo razonable si se desea
+    const safeLimit = Math.min(limit, 100); // Por ejemplo, máximo 100 items por página
+    return this.raffleService.findAllRafflesPaginated(page, safeLimit);
   }
 
   @UseGuards(JwtAuthGuard)

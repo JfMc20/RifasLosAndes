@@ -49,7 +49,7 @@ export interface UseTicketsResult {
 export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
   // Estados principales
   const [raffle, setRaffle] = useState<Raffle | null>(null);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]); // Tickets de la página actual
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [debugInfo, setDebugInfo] = useState<any>({});
@@ -59,9 +59,11 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
   const [filterStatus, setFilterStatus] = useState<TicketStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Estados para paginación
+  // Estados para paginación - ticketsPerPage es constante, totalPages y totalItems vendrán del backend
   const [currentPage, setCurrentPage] = useState(1);
-  const [ticketsPerPage] = useState(100);
+  const [ticketsPerPage] = useState(100); // Podría ser configurable
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0); // Total de tickets (filtrados o no)
   
   // Estados para venta
   const [buyerInfo, setBuyerInfo] = useState<BuyerInfo>({
@@ -72,153 +74,93 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
   });
   const [showSaleModal, setShowSaleModal] = useState(false);
 
-  // Función para cargar datos - extraída para poder reutilizarla
-  const fetchData = useCallback(async () => {
+  // Función para cargar datos
+  const fetchData = useCallback(async (pageToFetch: number = currentPage) => {
     if (!raffleId) {
       setError('No se proporcionó ID de rifa válido');
       setLoading(false);
       return;
     }
     
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      setError('');
-      console.log('Cargando datos para raffleId:', raffleId);
+      // Obtener datos de la rifa (solo si aún no se han cargado)
+      if (!raffle) {
+        const raffleData = await RaffleService.getRaffle(raffleId);
+        setRaffle(raffleData);
+      }
       
-      // Obtener datos de la rifa
-      const raffleData = await RaffleService.getRaffle(raffleId);
-      setRaffle(raffleData);
-      console.log('Datos de rifa cargados:', raffleData);
+      // TODO: Idealmente, el backend debería manejar filterStatus y searchQuery
+      // Por ahora, para la paginación, los ignoraremos en la llamada al backend
+      // y el filtrado/búsqueda se aplicaría sobre los datos de la página actual si se mantiene esa lógica.
+      // O, si el backend los soporta, se pasarían aquí:
+      // const params = { page: pageToFetch, limit: ticketsPerPage, status: filterStatus, search: searchQuery };
+      const response = await TicketService.getAllTickets(raffleId, pageToFetch, ticketsPerPage);
       
-      // Obtener todos los boletos de la rifa
-      const ticketData = await TicketService.getAllTickets(raffleId);
-      setTickets(ticketData);
-      console.log(`Cargados ${ticketData.length} boletos`);
-      
-      // Guardar información de depuración
-      setDebugInfo({
-        raffleId,
-        ticketCount: ticketData.length,
-        statusCount: {
-          disponibles: ticketData.filter(t => t.status === TicketStatus.AVAILABLE).length,
-          reservados: ticketData.filter(t => t.status === TicketStatus.RESERVED).length,
-          vendidos: ticketData.filter(t => t.status === TicketStatus.SOLD).length,
-        }
-      });
-      
-      setLoading(false);
+      setTickets(response.data);
+      setTotalItems(response.totalItems);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.currentPage); // Asegurar que currentPage se actualice desde la respuesta
+
+      // Limpiar selección si cambiamos de página y los tickets seleccionados ya no están visibles
+      // Esta lógica es compleja si los tickets seleccionados pueden estar en otras páginas.
+      // Por simplicidad, limpiaremos la selección al cambiar de página.
+      setSelectedTickets([]);
+
     } catch (err: any) {
       console.error('Error loading tickets data:', err);
       setError(err.message || 'Error al cargar los datos de boletos');
+      setTickets([]);
+      setTotalItems(0);
+      setTotalPages(0);
+    } finally {
       setLoading(false);
-      setDebugInfo({ error: err.toString() });
     }
-  }, [raffleId]);
+  }, [raffleId, raffle, currentPage, ticketsPerPage, filterStatus, searchQuery]); // filterStatus y searchQuery se añaden por si se implementa filtrado backend
 
-  // Cargar datos iniciales de la rifa y sus boletos
+  // Cargar datos iniciales y cuando cambien las dependencias de paginación/filtrado
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchData(currentPage);
+  }, [fetchData, currentPage, filterStatus, searchQuery]); // Se quita fetchData de aquí para evitar bucle si no se usa bien useCallback
 
-  // Aplicar filtros a los tickets
-  const applyFilters = useCallback(() => {
-    console.log(`Aplicando filtros: estado=${filterStatus}, búsqueda="${searchQuery}", total tickets=${tickets.length}`);
-    
-    return tickets.filter(ticket => {
-      // Si no hay ticket, no incluirlo
-      if (!ticket) return false;
-      
-      // Primero aplicamos el filtro por estado
-      if (filterStatus !== 'all' && ticket.status !== filterStatus) {
-        return false;
-      }
-      
-      // Si no hay consulta de búsqueda, incluimos todos los que pasaron el filtro por estado
-      if (!searchQuery || searchQuery.trim() === '') {
-        return true;
-      }
-      
-      // Convertir la búsqueda a minúsculas para comparación insensible a mayúsculas
-      const query = searchQuery.trim().toLowerCase();
-      
-      // Búsqueda exacta por número de boleto (prioridad alta)
-      if (ticket.number === searchQuery.trim()) {
-        return true;
-      }
-      
-      // Búsqueda por coincidencia parcial en número de boleto
-      if (ticket.number && ticket.number.includes(query)) {
-        return true;
-      }
-      
-      // Buscar en campos relacionados con el comprador si existen
-      if (ticket.buyerName && ticket.buyerName.toLowerCase().includes(query)) {
-        return true;
-      }
-      
-      if (ticket.buyerEmail && ticket.buyerEmail.toLowerCase().includes(query)) {
-        return true;
-      }
-      
-      if (ticket.buyerPhone && ticket.buyerPhone.toLowerCase().includes(query)) {
-        return true;
-      }
-      
-      if (ticket.transactionId && ticket.transactionId.toLowerCase().includes(query)) {
-        return true;
-      }
-      
-      // Si no coincide con ningún criterio de búsqueda, no lo incluimos
-      return false;
-    });
-  }, [tickets, filterStatus, searchQuery]);
+  // ELIMINAMOS LÓGICA DE FILTRADO FRONTEND Y PAGINACIÓN SLICE
+  // const applyFilters = useCallback(...);
+  // const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
+  // useEffect(() => { /* setFilteredTickets(applyFilters()) */ }, [applyFilters]);
   
-  // Aplicar filtros y obtener los tickets
-  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
+  // currentTickets ahora es simplemente 'tickets' (los de la página actual)
+  const currentTickets = tickets;
   
-  useEffect(() => {
-    const filtered = applyFilters();
-    setFilteredTickets(filtered);
-  }, [applyFilters]);
-  
-  // Los tickets que se muestran actualmente (con paginación)
-  const indexOfLastTicket = currentPage * ticketsPerPage;
-  const indexOfFirstTicket = indexOfLastTicket - ticketsPerPage;
-  const currentTickets = filteredTickets.slice(indexOfFirstTicket, indexOfLastTicket);
-  
-  // Total de páginas
-  const totalPages = Math.max(1, Math.ceil(filteredTickets.length / ticketsPerPage));
-  
-  // Depuración
-  useEffect(() => {
-    console.log(`Filtrado resultó en ${filteredTickets.length} boletos, mostrando página ${currentPage} de ${totalPages}`);
-    console.log(`Mostrando boletos ${indexOfFirstTicket+1}-${Math.min(indexOfLastTicket, filteredTickets.length)} de ${filteredTickets.length}`);
-  }, [filteredTickets.length, currentPage, totalPages, indexOfFirstTicket, indexOfLastTicket]);
+  // Índices para paginación (para el mensaje "Mostrando X a Y de Z")
+  // Estos se pueden calcular o obtener del componente Pagination si se le pasan totalItems e itemsPerPage
+  const indexOfFirstTicket = totalItems > 0 ? (currentPage - 1) * ticketsPerPage + 1 : 0;
+  const indexOfLastTicket = totalItems > 0 ? Math.min(currentPage * ticketsPerPage, totalItems) : 0;
   
   // Navegación entre páginas
   const paginate = useCallback((pageNumber: number) => {
-    console.log('Cambiando a página:', pageNumber);
-    setCurrentPage(pageNumber);
-    // Scroll al inicio de la tabla
-    const ticketsTable = document.querySelector('.tickets-table');
-    if (ticketsTable) {
-      ticketsTable.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (pageNumber !== currentPage) {
+      setCurrentPage(pageNumber); // Esto dispara el useEffect que llama a fetchData
+      const ticketsTable = document.querySelector('.tickets-table'); // Asumiendo que la tabla tiene esta clase
+      if (ticketsTable) {
+        ticketsTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
-  }, []);
+  }, [currentPage]);
   
   const nextPage = useCallback(() => {
     if (currentPage < totalPages) {
-      paginate(currentPage + 1);
+      setCurrentPage(prev => prev + 1);
     }
-  }, [currentPage, totalPages, paginate]);
+  }, [currentPage, totalPages]);
   
   const prevPage = useCallback(() => {
     if (currentPage > 1) {
-      paginate(currentPage - 1);
+      setCurrentPage(prev => prev - 1);
     }
-  }, [currentPage, paginate]);
+  }, [currentPage]);
 
   // Manejar selección de boletos
   const toggleTicketSelection = (ticketNumber: string) => {
@@ -257,48 +199,26 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
       );
       
       if (result.success) {
-        // Actualizar la lista de boletos
-        setTickets((prevTickets) =>
-          prevTickets.map((ticket) => {
-            // Si el ticket está en la lista de actualizados
-            if (numbersToUpdate.includes(ticket.number)) {
-              // Si el nuevo estado es AVAILABLE, SIEMPRE limpiar datos del comprador
-              // independientemente del estado anterior (vendido o reservado)
-              if (status === TicketStatus.AVAILABLE) {
-                return {
-                  ...ticket,
-                  status,
-                  buyerName: undefined,
-                  buyerEmail: undefined,
-                  buyerPhone: undefined,
-                  transactionId: undefined
-                };
-              } else {
-                // Para otros cambios de estado, solo actualizar el estado
-                return { ...ticket, status };
-              }
-            } else {
-              // No modificar tickets que no están en la lista
-              return ticket;
-            }
-          })
-        );
-        
-        // Solo limpiar los tickets seleccionados si no se especificaron números
-        if (!ticketNumbers) {
-          setSelectedTickets([]);
-        }
-        alert(`${result.modifiedCount} boletos actualizados al estado: ${status}`);
+        // Recargar datos de la página actual para reflejar los cambios
+        fetchData(currentPage);
+        // setSelectedTickets([]); // Limpiar selección después de la acción
+        NotificationService.success(`${result.modifiedCount} boletos actualizados a: ${status}`);
+      } else {
+        // Esto podría necesitar un manejo más específico si el backend devuelve success:false
+        NotificationService.error('No se pudieron actualizar todos los boletos.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al actualizar estado de boletos:', err);
-      alert('Error al actualizar los boletos. Por favor, intenta nuevamente.');
+      NotificationService.error(err.response?.data?.message || 'Error al actualizar los boletos.');
     }
   };
 
   // Completar venta de boletos seleccionados
   const completeSale = async () => {
-    if (!raffleId || selectedTickets.length === 0 || !buyerInfo.name) return;
+    if (!raffleId || selectedTickets.length === 0 || !buyerInfo.name) {
+      NotificationService.warning('Selecciona boletos e ingresa el nombre del comprador.');
+      return;
+    }
     
     try {
       const result = await TicketService.completeSale(
@@ -308,23 +228,9 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
       );
       
       if (result.success) {
-        // Actualizar la lista de boletos
-        setTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            selectedTickets.includes(ticket.number)
-              ? {
-                  ...ticket,
-                  status: TicketStatus.SOLD,
-                  buyerName: buyerInfo.name,
-                  buyerEmail: buyerInfo.email,
-                  buyerPhone: buyerInfo.phone,
-                  transactionId: buyerInfo.transactionId,
-                }
-              : ticket
-          )
-        );
-        
-        setSelectedTickets([]);
+        // Recargar datos de la página actual
+        fetchData(currentPage);
+        // setSelectedTickets([]); // Limpiar selección
         setShowSaleModal(false);
         setBuyerInfo({
           name: '',
@@ -332,12 +238,13 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
           phone: '',
           transactionId: '',
         });
-        
-        alert(`${result.modifiedCount} boletos vendidos a ${buyerInfo.name}`);
+        NotificationService.success(`${result.modifiedCount} boletos vendidos a ${buyerInfo.name}`);
+      } else {
+        NotificationService.error('No se pudieron vender todos los boletos seleccionados.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al completar la venta:', err);
-      alert('Error al procesar la venta. Por favor, intenta nuevamente.');
+      NotificationService.error(err.response?.data?.message || 'Error al procesar la venta.');
     }
   };
 
