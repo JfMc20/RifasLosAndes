@@ -168,37 +168,38 @@ const ProfilePage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Mi Perfil - Admin Panel - Rifa Los Andes</title>
+        <title>Mi Perfil - Rifas Los Andes</title>
       </Head>
-      
       <AdminLayout title="Mi Perfil">
-        {loading ? (
+        {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">Cargando...</div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-accent"></div>
           </div>
-        ) : user ? (
-          <div className="space-y-8">
-            {error && (
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-                <p>{error}</p>
-              </div>
-            )}
-            
-            {success && (
-              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
-                <p>{success}</p>
-              </div>
-            )}
-            
-            {/* Información de perfil */}
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-5">Información del perfil</h2>
-              <form onSubmit={handleUpdateProfile}>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        )}
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg mb-6" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-700 px-4 py-3 rounded-lg mb-6" role="alert">
+            <strong className="font-bold">Éxito: </strong>
+            <span className="block sm:inline">{success}</span>
+          </div>
+        )}
+
+        {!loading && user && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Card: Información del perfil */}
+            <div className="bg-ui-surface p-8 rounded-xl shadow-lg border border-ui-border">
+              <h2 className="text-2xl font-bold text-ui-text-primary mb-6">Información del Perfil</h2>
+              <form onSubmit={handleUpdateProfile} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre de usuario *
-                    </label>
+                    <label htmlFor="username" className="block text-sm font-medium text-ui-text-secondary mb-1">Nombre de usuario *</label>
                     <input
                       type="text"
                       name="username"
@@ -206,93 +207,65 @@ const ProfilePage: React.FC = () => {
                       required
                       value={profileData.username}
                       onChange={handleProfileChange}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
                     />
                   </div>
-                  
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo
-                    </label>
+                    <label htmlFor="name" className="block text-sm font-medium text-ui-text-secondary mb-1">Nombre completo</label>
                     <input
                       type="text"
                       name="name"
                       id="name"
                       value={profileData.name}
                       onChange={handleProfileChange}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      required
-                      value={profileData.email}
-                      onChange={handleProfileChange}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                      Rol
-                    </label>
-                    <input
-                      type="text"
-                      id="role"
-                      value={user.role === 'admin' ? 'Administrador' : 'Usuario'}
-                      disabled
-                      className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
+                      className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
                     />
                   </div>
                 </div>
-                
-                <div className="mt-6 flex justify-end">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-ui-text-secondary mb-1">Email *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    value={profileData.email}
+                    onChange={handleProfileChange}
+                    className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
+                  />
+                </div>
+                <div className="flex justify-end pt-4">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                    className="flex items-center justify-center px-6 py-3 bg-brand-primary text-white rounded-lg font-semibold hover:bg-brand-primary-dark transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Guardando...' : 'Actualizar perfil'}
+                    {saving ? 'Guardando...' : 'Guardar Cambios'}
                   </button>
                 </div>
               </form>
             </div>
             
-            {/* Cambio de contraseña */}
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-5">Cambiar contraseña</h2>
-              <form onSubmit={handleChangePassword}>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Card: Cambio de contraseña */}
+            <div className="bg-ui-surface p-8 rounded-xl shadow-lg border border-ui-border">
+              <h2 className="text-2xl font-bold text-ui-text-primary mb-6">Cambiar Contraseña</h2>
+              <form onSubmit={handleChangePassword} className="space-y-6">
+                <div>
+                  <label htmlFor="currentPassword" className="block text-sm font-medium text-ui-text-secondary mb-1">Contraseña actual *</label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    id="currentPassword"
+                    required
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      Contraseña actual *
-                    </label>
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      id="currentPassword"
-                      required
-                      value={passwordData.currentPassword}
-                      onChange={handlePasswordChange}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                    />
-                  </div>
-                  
-                  <div className="sm:col-span-2">
-                    <div className="h-px bg-gray-200 my-6"></div>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      Nueva contraseña *
-                    </label>
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-ui-text-secondary mb-1">Nueva contraseña *</label>
                     <input
                       type="password"
                       name="newPassword"
@@ -301,17 +274,12 @@ const ProfilePage: React.FC = () => {
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
                       minLength={8}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
                     />
-                    <p className="mt-1 text-xs text-gray-500">
-                      La contraseña debe tener al menos 8 caracteres.
-                    </p>
+                    <p className="mt-2 text-xs text-ui-text-secondary">Mínimo 8 caracteres.</p>
                   </div>
-                  
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirmar nueva contraseña *
-                    </label>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-ui-text-secondary mb-1">Confirmar nueva contraseña *</label>
                     <input
                       type="password"
                       name="confirmPassword"
@@ -320,32 +288,27 @@ const ProfilePage: React.FC = () => {
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
                       minLength={8}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
                     />
                   </div>
                 </div>
-                
-                <div className="mt-6 flex justify-end">
+                <div className="flex justify-end pt-4">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                    className="flex items-center justify-center px-6 py-3 bg-brand-primary text-white rounded-lg font-semibold hover:bg-brand-primary-dark transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Cambiando...' : 'Cambiar contraseña'}
+                    {saving ? 'Cambiando...' : 'Cambiar Contraseña'}
                   </button>
                 </div>
               </form>
             </div>
           </div>
-        ) : (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-            <p>No se pudo cargar la información del perfil.</p>
-            <button
-              onClick={() => router.push('/admin/dashboard')}
-              className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
-            >
-              Volver al Dashboard
-            </button>
+        )}
+        {!loading && !user && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
+            <p className="font-bold">Atención</p>
+            <p>No se pudo cargar la información del perfil. Por favor, intenta de nuevo más tarde.</p>
           </div>
         )}
       </AdminLayout>

@@ -17,17 +17,18 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
   selectedCount
 }) => {
   return (
-    <div className="bg-white shadow rounded-lg p-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="mb-6 pb-6 border-b border-ui-border">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
         {/* Filtro por estado */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="status-filter" className="block text-sm font-bold text-ui-text-secondary mb-2">
             Filtrar por Estado
           </label>
           <select
+            id="status-filter"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as TicketStatus | 'all')}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+            className="block w-full text-sm rounded-lg border-ui-border bg-ui-input text-ui-text-primary focus:ring-brand-accent focus:border-brand-accent transition duration-200"
           >
             <option value="all">Todos los estados</option>
             <option value={TicketStatus.AVAILABLE}>Disponibles</option>
@@ -38,22 +39,23 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
         
         {/* Búsqueda */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="search-filter" className="block text-sm font-bold text-ui-text-secondary mb-2">
             Buscar Boleto o Comprador
           </label>
           <input
+            id="search-filter"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Número de boleto, nombre, email..."
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+            placeholder="Número, nombre, email..."
+            className="block w-full text-sm rounded-lg border-ui-border bg-ui-input text-ui-text-primary focus:ring-brand-accent focus:border-brand-accent transition duration-200"
           />
         </div>
         
         {/* Contador de seleccionados */}
-        <div className="flex items-end justify-end">
-          <p className="text-sm font-medium text-gray-700">
-            {selectedCount} boletos seleccionados
+        <div className="text-right">
+          <p className="text-sm font-bold text-ui-text-primary bg-brand-primary-light text-brand-primary px-4 py-2 rounded-lg inline-block">
+            {selectedCount} {selectedCount === 1 ? 'boleto seleccionado' : 'boletos seleccionados'}
           </p>
         </div>
       </div>

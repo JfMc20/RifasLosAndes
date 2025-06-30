@@ -114,22 +114,32 @@ const EditRafflePage: React.FC = () => {
         <title>Editar Rifa - Admin Panel - Rifa Los Andes</title>
       </Head>
       
-      <AdminLayout title="Editar Rifa">
-        {loading ? (
+      <AdminLayout title={raffle ? `Editando: ${raffle.name}` : 'Editar Rifa'}>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-ui-text-primary">Editar Rifa</h1>
+          <p className="text-ui-text-secondary mt-1">Modifica los detalles de la rifa y sus promociones.</p>
+        </div>
+
+        {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">Cargando información de la rifa...</div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-brand-accent"></div>
           </div>
-        ) : error ? (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-            <p>{error}</p>
+        )}
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+            <strong className="font-bold">Error:</strong>
+            <span className="block sm:inline"> {error}</span>
             <button
               onClick={() => router.push('/admin/raffles')}
-              className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+              className="mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors duration-200"
             >
-              Volver a Rifas
+              Volver a la lista
             </button>
           </div>
-        ) : raffle ? (
+        )}
+
+        {!loading && !error && raffle ? (
           <RaffleForm
             initialRaffle={raffle}
             initialPromotions={promotions}
@@ -137,15 +147,18 @@ const EditRafflePage: React.FC = () => {
             onSubmit={handleUpdateRaffle}
           />
         ) : (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-            <p>No se encontró la rifa solicitada.</p>
-            <button
-              onClick={() => router.push('/admin/raffles')}
-              className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
-            >
-              Volver a Rifas
-            </button>
-          </div>
+          !loading && (
+            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg relative" role="alert">
+              <strong className="font-bold">Aviso:</strong>
+              <span className="block sm:inline"> No se encontró la rifa solicitada.</span>
+              <button
+                onClick={() => router.push('/admin/raffles')}
+                className="mt-4 px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors duration-200"
+              >
+                Volver a la lista
+              </button>
+            </div>
+          )
         )}
       </AdminLayout>
     </>

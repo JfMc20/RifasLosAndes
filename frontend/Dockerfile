@@ -5,7 +5,7 @@ WORKDIR /app
 # Copia los archivos de definición de paquetes
 COPY package*.json ./
 
-# Instala las dependencias
+# Instala las dependencias (sharp debe estar en package.json)
 RUN npm install
 
 # Copia el código fuente
@@ -19,6 +19,9 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
+# Instala vips, la dependencia de sistema requerida por sharp en Alpine
+RUN apk add --no-cache vips-dev
+
 # Configura para producción
 ENV NODE_ENV production
 
@@ -28,6 +31,9 @@ COPY --from=builder /app/.next/standalone ./
 # Copia archivos públicos y estáticos necesarios
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
+
+# Cambia la propiedad de los archivos al usuario node para que pueda escribir en el cache
+RUN chown -R node:node /app
 
 # Cambia al usuario node para mejorar la seguridad
 USER node

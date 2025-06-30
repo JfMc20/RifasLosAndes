@@ -91,8 +91,6 @@ const PrizeCarouselSection: React.FC<PrizeCarouselSectionProps> = ({ carouselCon
           </p>
         </motion.div>
 
-        <div className="w-1/4 sm:w-1/6 h-0.5 bg-yellow-500 mx-auto mb-8 rounded-full"></div>
-
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}

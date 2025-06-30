@@ -136,19 +136,26 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-          <p>{error}</p>
+        <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg flex items-center gap-4" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+                <strong className="font-bold">¡Error!</strong>
+                <p>{error}</p>
+            </div>
         </div>
       )}
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium mb-6">Información de la Rifa</h2>
-        
+      <div className="bg-ui-surface rounded-xl shadow-lg border border-ui-border p-6 md:p-8">
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-ui-text-primary">Información General</h2>
+          <p className="text-ui-text-secondary mt-1">Define los detalles principales de tu rifa.</p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre de la Rifa *
-            </label>
+          <div className="md:col-span-2">
+            <label htmlFor="name" className="block text-sm font-bold text-ui-text-secondary mb-2">Nombre de la Rifa</label>
             <input
               type="text"
               id="name"
@@ -156,142 +163,136 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
               value={raffleData.name || ''}
               onChange={handleRaffleChange}
               required
-              className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              placeholder="Ej: Rifa para el viaje de estudios"
             />
           </div>
 
-          <div>
-            <label htmlFor="prize" className="block text-sm font-medium text-gray-700 mb-1">
-              Premio *
-            </label>
-            <input
-              type="text"
+          <div className="md:col-span-2">
+            <label htmlFor="prize" className="block text-sm font-bold text-ui-text-secondary mb-2">Premio</label>
+            <textarea
               id="prize"
               name="prize"
               value={raffleData.prize || ''}
               onChange={handleRaffleChange}
               required
-              className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+              rows={3}
+              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              placeholder="Ej: Un auto 0km, un viaje a la playa, etc."
             />
           </div>
 
           <div>
-            <label htmlFor="totalTickets" className="block text-sm font-medium text-gray-700 mb-1">
-              Total de Boletos *
-            </label>
+            <label htmlFor="totalTickets" className="block text-sm font-bold text-ui-text-secondary mb-2">Total de Boletos</label>
             <input
               type="number"
               id="totalTickets"
               name="totalTickets"
               value={raffleData.totalTickets || ''}
               onChange={handleRaffleChange}
-              min="1"
               required
-              className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
             />
           </div>
 
           <div>
-            <label htmlFor="ticketPrice" className="block text-sm font-medium text-gray-700 mb-1">
-              Precio por Boleto ($) *
-            </label>
+            <label htmlFor="ticketPrice" className="block text-sm font-bold text-ui-text-secondary mb-2">Precio por Boleto ($)</label>
             <input
               type="number"
               id="ticketPrice"
               name="ticketPrice"
               value={raffleData.ticketPrice || ''}
               onChange={handleRaffleChange}
-              min="0.01"
-              step="0.01"
               required
-              className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
             />
           </div>
 
           <div>
-            <label htmlFor="drawMethod" className="block text-sm font-medium text-gray-700 mb-1">
-              Método de Sorteo
-            </label>
-            <input
-              type="text"
+            <label htmlFor="drawMethod" className="block text-sm font-bold text-ui-text-secondary mb-2">Método de Sorteo</label>
+            <select
               id="drawMethod"
               name="drawMethod"
               value={raffleData.drawMethod || ''}
               onChange={handleRaffleChange}
-              className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
-            />
+              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+            >
+              <option>Lotería Nacional</option>
+              <option>Tómbola</option>
+              <option>Otro</option>
+            </select>
           </div>
 
-          <div className="flex items-center h-full pt-6">
+          <div className="flex items-center justify-start mt-6">
             <input
-              type="checkbox"
               id="isActive"
               name="isActive"
+              type="checkbox"
               checked={raffleData.isActive || false}
               onChange={handleRaffleChange}
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              className="h-5 w-5 text-brand-accent bg-ui-background border-ui-border rounded focus:ring-brand-accent transition"
             />
-            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
+            <label htmlFor="isActive" className="ml-3 block text-sm font-bold text-ui-text-primary">
               Rifa Activa
             </label>
           </div>
         </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-ui-surface rounded-xl shadow-lg border border-ui-border p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-medium">Promociones</h2>
+          <div>
+            <h2 className="text-xl font-bold text-ui-text-primary">Promociones</h2>
+            <p className="text-ui-text-secondary mt-1">Configura ofertas especiales para la compra de múltiples boletos.</p>
+          </div>
           <button
             type="button"
             onClick={addPromotion}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none"
+            className="px-4 py-2 bg-brand-accent text-white font-bold rounded-lg hover:bg-brand-accent-dark transition-all duration-200 transform hover:scale-105 shadow-md"
           >
             Agregar Promoción
           </button>
         </div>
 
         {promotions.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No hay promociones configuradas</p>
+          <div className="text-center py-8">
+            <p className="text-ui-text-secondary">No hay promociones configuradas.</p>
+            <p className="text-sm text-ui-text-secondary/80">Puedes agregar una usando el botón de arriba.</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {promotions.map((promotion, index) => (
-              <div key={index} className="flex flex-wrap items-end gap-4 pb-4 border-b border-gray-200">
-                <div className="w-full sm:w-auto">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Cantidad
-                  </label>
+              <div key={index} className="flex flex-wrap items-end gap-4 p-4 rounded-lg border border-ui-border bg-ui-background">
+                <div className="flex-grow min-w-[100px]">
+                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Cantidad</label>
                   <input
                     type="number"
-                    value={promotion.quantity || 0}
+                    value={promotion.quantity || ''}
                     onChange={(e) => handlePromotionChange(index, 'quantity', e.target.value)}
                     min="2"
-                    className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
                   />
                 </div>
                 
-                <div className="w-full sm:w-auto">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Precio ($)
-                  </label>
+                <div className="flex-grow min-w-[100px]">
+                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Precio ($)</label>
                   <input
                     type="number"
-                    value={promotion.price || 0}
+                    value={promotion.price || ''}
                     onChange={(e) => handlePromotionChange(index, 'price', e.target.value)}
                     min="0.01"
                     step="0.01"
-                    className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
                   />
                 </div>
                 
-                <div className="flex-grow">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Descripción
-                  </label>
+                <div className="flex-grow min-w-[200px]">
+                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Descripción</label>
                   <input
                     type="text"
                     value={promotion.description || ''}
                     onChange={(e) => handlePromotionChange(index, 'description', e.target.value)}
-                    className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
                   />
                 </div>
                 
@@ -299,7 +300,7 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
                   <button
                     type="button"
                     onClick={() => removePromotion(index)}
-                    className="inline-flex items-center justify-center p-2 border border-transparent rounded-md text-red-600 hover:bg-red-100 focus:outline-none"
+                    className="p-3 text-brand-danger hover:bg-brand-danger/10 rounded-lg transition-colors duration-200"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -312,20 +313,18 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
         )}
       </div>
 
-      <div className="flex justify-end space-x-3">
+      <div className="flex justify-end space-x-4 mt-8">
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+          className="px-6 py-3 border border-ui-border shadow-sm text-sm font-bold rounded-lg text-ui-text-primary bg-ui-surface hover:bg-ui-background focus:outline-none transition-all duration-200"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className={`px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none ${
-            isLoading ? 'opacity-70 cursor-not-allowed' : ''
-          }`}
+          className="px-6 py-3 border border-transparent shadow-lg text-sm font-bold rounded-lg text-white bg-brand-primary hover:bg-brand-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
         >
           {isLoading ? 'Guardando...' : isEditing ? 'Actualizar Rifa' : 'Crear Rifa'}
         </button>

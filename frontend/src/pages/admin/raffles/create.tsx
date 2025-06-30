@@ -77,7 +77,21 @@ const CreateRaffle: React.FC = () => {
       </Head>
       
       <AdminLayout title="Crear Nueva Rifa">
-        <RaffleForm onSubmit={handleCreateRaffle} />
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-ui-text-primary">Crear Nueva Rifa</h1>
+            <p className="text-ui-text-secondary mt-1">Completa los detalles para configurar tu nueva rifa.</p>
+          </div>
+          <button 
+            onClick={() => router.push('/admin/raffles')}
+            className="px-4 py-2 bg-ui-surface border border-ui-border rounded-lg text-ui-text-primary font-semibold hover:bg-ui-background transition-colors"
+          >
+            Volver a la lista
+          </button>
+        </div>
+        <div className="bg-ui-surface rounded-xl shadow-lg border border-ui-border p-8">
+          <RaffleForm onSubmit={handleCreateRaffle} />
+        </div>
       </AdminLayout>
     </>
   );

@@ -13,25 +13,26 @@ const TicketActions: React.FC<TicketActionsProps> = ({
   openSaleModal
 }) => {
   if (selectedTickets.length === 0) return null;
-  
+
   return (
-    <div className="bg-gray-100 shadow rounded-lg p-4 mb-6">
-      <div className="flex flex-wrap gap-2">
+    <div className="bg-brand-primary-light border border-brand-accent rounded-lg p-4 mb-6 transition-all duration-300 ease-in-out">
+      <div className="flex flex-wrap items-center gap-4">
+        <span className="text-sm font-bold text-brand-primary">Acciones para {selectedTickets.length} boletos:</span>
         <button
           onClick={() => updateTicketsStatus(TicketStatus.AVAILABLE)}
-          className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="px-4 py-2 text-sm font-semibold text-ui-text-primary bg-ui-surface border border-ui-border rounded-lg hover:bg-ui-background transition-colors duration-200"
         >
-          Marcar como Disponibles
+          Marcar Disponibles
         </button>
         <button
           onClick={() => updateTicketsStatus(TicketStatus.RESERVED)}
-          className="px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+          className="px-4 py-2 text-sm font-semibold text-amber-800 bg-amber-100 border border-amber-200 rounded-lg hover:bg-amber-200 transition-colors duration-200"
         >
-          Marcar como Reservados
+          Marcar Reservados
         </button>
         <button
           onClick={openSaleModal}
-          className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          className="px-4 py-2 text-sm font-semibold text-white bg-brand-primary rounded-lg hover:bg-opacity-90 transition-colors duration-200 shadow-sm"
         >
           Completar Venta
         </button>

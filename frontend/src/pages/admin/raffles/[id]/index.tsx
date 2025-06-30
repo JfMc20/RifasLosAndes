@@ -46,99 +46,67 @@ const RaffleDetailPage: React.FC = () => {
       <Head>
         <title>{raffle ? `Rifa: ${raffle.name}` : 'Detalle de Rifa'}</title>
       </Head>
-      <AdminLayout title="Detalle de Rifa">
-        <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <AdminLayout title={raffle ? `Rifa: ${raffle.name}` : 'Detalle de Rifa'}>
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Detalle de la Rifa</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Información detallada de la rifa seleccionada.
-            </p>
+            <h1 className="text-3xl font-bold text-ui-text-primary">Detalle de la Rifa</h1>
+            <p className="text-ui-text-secondary mt-1">Información detallada de la rifa seleccionada.</p>
           </div>
-          <Link href="/admin/raffles" passHref>
-            <span className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 cursor-pointer">
+          <Link href="/admin/raffles" legacyBehavior>
+            <a className="px-5 py-3 border border-ui-border shadow-sm text-sm font-bold rounded-lg text-ui-text-primary bg-ui-surface hover:bg-ui-background focus:outline-none transition-all duration-200">
               Volver a la lista
-            </span>
+            </a>
           </Link>
         </div>
 
-        {loading ? (
-          <div className="text-center py-10">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            <p className="mt-2 text-gray-600">Cargando información...</p>
+        {loading && (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-brand-accent"></div>
           </div>
-        ) : error ? (
-          <div className="rounded-md bg-red-50 p-4 my-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error}</p>
-                </div>
+        )}
+
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">{error}</div>}
+
+        {!loading && !error && raffle && (
+          <div className="bg-ui-surface rounded-xl shadow-lg border border-ui-border overflow-hidden">
+            <div className="p-6 border-b border-ui-border">
+              <div className="flex justify-between items-start">
+                <h2 className="text-2xl font-bold text-ui-text-primary">{raffle.name}</h2>
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${raffle.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {raffle.isActive ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+              <p className="text-ui-text-secondary mt-1">{raffle.prize}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-ui-border">
+              <div className="bg-ui-surface p-6">
+                <h3 className="text-sm font-medium text-ui-text-secondary">Precio por Boleto</h3>
+                <p className="mt-1 text-2xl font-semibold text-ui-text-primary">${raffle.ticketPrice}</p>
+              </div>
+              <div className="bg-ui-surface p-6">
+                <h3 className="text-sm font-medium text-ui-text-secondary">Total de Boletos</h3>
+                <p className="mt-1 text-2xl font-semibold text-ui-text-primary">{raffle.totalTickets}</p>
+              </div>
+              <div className="bg-ui-surface p-6">
+                <h3 className="text-sm font-medium text-ui-text-secondary">Método de Sorteo</h3>
+                <p className="mt-1 text-2xl font-semibold text-ui-text-primary">{raffle.drawMethod}</p>
               </div>
             </div>
-          </div>
-        ) : raffle ? (
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div className="px-4 py-5 sm:px-6 bg-gray-50">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">{raffle.name}</h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                {raffle.isActive ? (
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Activa
-                  </span>
-                ) : (
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    Inactiva
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className="border-t border-gray-200">
-              <dl>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Premio</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{raffle.prize}</dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Precio por boleto</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${raffle.ticketPrice}</dd>
-                </div>
-                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Total de boletos</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{raffle.totalTickets}</dd>
-                </div>
-                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                  <dt className="text-sm font-medium text-gray-500">Método de sorteo</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {raffle.drawMethod}
-                  </dd>
-                </div>
-                {raffle.prize && (
-                  <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Premio</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{raffle.prize}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-            
-            <div className="px-4 py-3 bg-gray-50 text-right sm:px-6 flex justify-end space-x-3">
-              <Link href={`/admin/raffles/${raffle._id}/edit`} passHref>
-                <span className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer">
-                  Editar Rifa
-                </span>
+
+            <div className="p-6 flex justify-end space-x-4">
+              <Link href={`/admin/raffles/${raffle._id}/edit`} legacyBehavior>
+                <a className="px-5 py-3 bg-brand-primary text-white rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-200 transform hover:scale-105 shadow-md">Editar Rifa</a>
               </Link>
-              <Link href={`/admin/raffles/${raffle._id}/tickets`} passHref>
-                <span className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer">
-                  Ver Boletos
-                </span>
+              <Link href={`/admin/raffles/${raffle._id}/tickets`} legacyBehavior>
+                <a className="px-5 py-3 bg-brand-accent text-white rounded-lg font-semibold hover:bg-opacity-90 transition-all duration-200 transform hover:scale-105 shadow-md">Ver Boletos</a>
               </Link>
             </div>
           </div>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-gray-600">No se encontró la rifa.</p>
-          </div>
+        )}
+
+        {!loading && !raffle && (
+          <div className="text-center py-10 text-ui-text-secondary">No se encontró la rifa.</div>
         )}
       </AdminLayout>
     </>

@@ -113,110 +113,62 @@ const RafflesPage: React.FC = () => {
       </Head>
       
       <AdminLayout title="Gestión de Rifas">
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">Rifas</h2>
-          <Link href="/admin/raffles/create" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none">
-              Crear nueva rifa
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-ui-text-primary">Tus Rifas</h1>
+            <p className="text-ui-text-secondary mt-1">Crea, gestiona y visualiza todas tus rifas desde aquí.</p>
+          </div>
+          <Link href="/admin/raffles/create" legacyBehavior>
+            <a className="flex items-center justify-center px-5 py-3 bg-brand-primary text-white rounded-lg font-bold hover:bg-brand-primary-dark transition-all duration-200 transform hover:scale-105 shadow-lg">
+              Crear Nueva Rifa
+            </a>
           </Link>
         </div>
 
-        {loading ? (
+        {loading && (
           <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600">Cargando rifas...</div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-accent"></div>
           </div>
-        ) : error ? (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-            <p>{error}</p>
-          </div>
-        ) : raffles.length === 0 ? (
-          <div className="bg-white shadow rounded-lg p-6 text-center">
-            <p className="text-gray-600 mb-4">No hay rifas creadas.</p>
-            <Link href="/admin/raffles/create" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none">
-                Crear primera rifa
-            </Link>
-          </div>
-        ) : (
-          <div className="bg-white shadow overflow-hidden rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+        )}
+
+        {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg relative" role="alert">
+                <strong className="font-bold">Error: </strong>
+                <span className="block sm:inline">{error}</span>
+            </div>
+        )}
+
+        {!loading && !error && (
+          <div className="overflow-x-auto bg-ui-surface rounded-xl shadow-lg border border-ui-border">
+            <table className="min-w-full divide-y divide-ui-border">
+              <thead className="bg-ui-background">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nombre
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Premio
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Precio
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total boletos
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Nombre</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Premio</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Precio</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Total Boletos</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Estado</th>
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-ui-surface divide-y divide-ui-border">
                 {raffles.map((raffle) => (
-                  <tr key={raffle._id}>
+                  <tr key={raffle._id} className="hover:bg-ui-background transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-ui-text-primary">{raffle.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.prize}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">${raffle.ticketPrice}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-ui-text-secondary">{raffle.totalTickets}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{raffle.name}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{raffle.prize}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">${raffle.ticketPrice}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{raffle.totalTickets}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        raffle.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${raffle.isActive ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
                         {raffle.isActive ? 'Activa' : 'Inactiva'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <ActionButtons 
-                        actions={[
-                          {
-                            label: "Ver",
-                            href: `/admin/raffles/${raffle._id}`,
-                            color: "primary"
-                          },
-                          {
-                            label: "Editar",
-                            href: `/admin/raffles/${raffle._id}/edit`,
-                            color: "indigo"
-                          },
-                          {
-                            label: "Boletos",
-                            href: `/admin/raffles/${raffle._id}/tickets`,
-                            color: "blue"
-                          },
-                          {
-                            label: raffle.isActive ? "Desactivar" : "Activar",
-                            color: raffle.isActive ? "red" : "green",
-                            onClick: () => toggleRaffleStatus(raffle)
-                          },
-                          {
-                            label: "Init. Boletos",
-                            color: "yellow",
-                            onClick: () => initializeTickets(raffle._id)
-                          },
-                          {
-                            label: "Eliminar",
-                            color: "red",
-                            onClick: () => deleteRaffle(raffle._id)
-                          }
-                        ]}
-                      />
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      <Link href={`/admin/raffles/${raffle._id}`} legacyBehavior><a className="px-3 py-1 rounded-md bg-brand-accent/20 text-brand-accent font-bold hover:bg-brand-accent/30 transition">Ver</a></Link>
+                      <Link href={`/admin/raffles/${raffle._id}/edit`} legacyBehavior><a className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-500 font-bold hover:bg-blue-500/30 transition">Editar</a></Link>
+                      <button onClick={() => toggleRaffleStatus(raffle)} className={`px-3 py-1 rounded-md font-bold transition ${raffle.isActive ? 'bg-red-500/20 text-red-500 hover:bg-red-500/30' : 'bg-green-500/20 text-green-500 hover:bg-green-500/30'}`}>{raffle.isActive ? 'Desactivar' : 'Activar'}</button>
+                      <button onClick={() => initializeTickets(raffle._id)} className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-500 font-bold hover:bg-yellow-500/30 transition">Init. Boletos</button>
+                      <button onClick={() => deleteRaffle(raffle._id)} className="px-3 py-1 rounded-md bg-brand-danger/20 text-brand-danger font-bold hover:bg-brand-danger/30 transition">Eliminar</button>
                     </td>
                   </tr>
                 ))}

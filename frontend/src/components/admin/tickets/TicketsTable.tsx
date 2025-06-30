@@ -39,51 +39,57 @@ const TicketsTable: React.FC<TicketsTableProps> = ({
     }
   }, [highlightTicket]);
   return (
-    <div className="bg-white shadow overflow-hidden rounded-lg tickets-table">
+    <div className="overflow-x-auto">
       <style jsx global>{`
         .highlight-animation {
           animation: highlight 3s ease-in-out;
         }
         
         @keyframes highlight {
-          0% { background-color: rgba(59, 130, 246, 0.1); }
-          50% { background-color: rgba(59, 130, 246, 0.3); }
+          0% { background-color: rgba(230, 239, 255, 0.5); }
+          50% { background-color: rgba(230, 239, 255, 0.8); }
           100% { background-color: transparent; }
         }
       `}</style>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-ui-border">
+        <thead className="bg-ui-background">
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               <input
                 type="checkbox"
                 onChange={(e) => selectAll(e.target.checked)}
                 checked={tickets.length > 0 && selectedTickets.length === tickets.length}
-                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                className="h-4 w-4 rounded border-ui-border text-brand-accent focus:ring-brand-accent"
               />
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               Número
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               Estado
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               Comprador
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               Contacto
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-ui-text-secondary uppercase tracking-wider">
               Transacción
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-ui-surface divide-y divide-ui-border">
           {tickets.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                No hay boletos que coincidan con los filtros
+              <td colSpan={6} className="px-6 py-16 text-center text-ui-text-secondary">
+                <div className="flex flex-col items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-ui-text-secondary mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span className="font-semibold">No se encontraron boletos</span>
+                  <span className="text-sm">Intenta ajustar los filtros de búsqueda.</span>
+                </div>
               </td>
             </tr>
           ) : (
@@ -91,76 +97,49 @@ const TicketsTable: React.FC<TicketsTableProps> = ({
               <tr 
                 key={ticket.number} 
                 id={`ticket-${ticket.number}`}
-                className={`transition-colors ${highlightTicket === ticket.number ? 'highlight-animation' : ''} ${selectedTickets.includes(ticket.number) ? "bg-blue-50" : ""}`}>
+                className={`transition-colors duration-200 hover:bg-ui-background ${selectedTickets.includes(ticket.number) ? "bg-brand-primary-light" : ""}`}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="checkbox"
                     checked={selectedTickets.includes(ticket.number)}
                     onChange={() => toggleTicketSelection(ticket.number)}
-                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    className="h-4 w-4 rounded border-ui-border text-brand-accent focus:ring-brand-accent"
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{ticket.number}</div>
+                  <div className="text-sm font-bold text-ui-text-primary">{ticket.number}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${
                     ticket.status === TicketStatus.AVAILABLE
-                      ? 'bg-blue-100 text-blue-800'
+                      ? 'bg-gray-100 text-gray-800'
                       : ticket.status === TicketStatus.RESERVED
-                      ? 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-amber-100 text-amber-800'
                       : 'bg-green-100 text-green-800'
                   }`}>
-                    {ticket.status === TicketStatus.AVAILABLE
-                      ? 'Disponible'
-                      : ticket.status === TicketStatus.RESERVED
-                      ? 'Reservado'
-                      : 'Vendido'}
+                    {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {ticket.buyerName || '-'}
+                  <div className="text-sm text-ui-text-primary">
+                    {ticket.buyerName || <span className="text-ui-text-secondary">-</span>}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-ui-text-secondary">
                     {ticket.buyerEmail && (
-                      <div>Email: {ticket.buyerEmail}</div>
+                      <div>{ticket.buyerEmail}</div>
                     )}
                     {ticket.buyerPhone && (
-                      <div>Tel: {ticket.buyerPhone}</div>
+                      <div>{ticket.buyerPhone}</div>
                     )}
                     {!ticket.buyerEmail && !ticket.buyerPhone && '-'}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-ui-text-secondary">
                     {ticket.transactionId || '-'}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  {selectedTickets.includes(ticket.number) && (
-                    <ActionButtons 
-                      actions={[
-                        {
-                          label: "Disponible",
-                          color: "blue",
-                          onClick: () => updateTicketsStatus(TicketStatus.AVAILABLE, [ticket.number])
-                        },
-                        {
-                          label: "Reservar",
-                          color: "yellow",
-                          onClick: () => updateTicketsStatus(TicketStatus.RESERVED, [ticket.number])
-                        },
-                        {
-                          label: "Vender",
-                          color: "green",
-                          onClick: () => openSaleModal([ticket.number])
-                        }
-                      ]}
-                    />
-                  )}
                 </td>
               </tr>
             ))

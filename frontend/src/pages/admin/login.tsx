@@ -37,23 +37,30 @@ const Login: React.FC = () => {
       <Head>
         <title>Login - Admin Panel - Rifa Los Andes</title>
       </Head>
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-lg shadow-lg">
+      <div className="min-h-screen bg-brand-primary flex flex-col justify-center items-center p-4">
+        <div className="max-w-md w-full bg-ui-surface rounded-2xl shadow-2xl p-8 space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary">Rifa Los Andes</h1>
-            <h2 className="mt-6 text-xl font-bold text-gray-900">Panel de Administración</h2>
+            <svg className="mx-auto h-12 w-auto text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-ui-text-primary">
+              Panel de Administración
+            </h2>
+            <p className="mt-2 text-center text-sm text-ui-text-secondary">
+              Bienvenido a Rifa Los Andes
+            </p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
                 <span className="block sm:inline">{error}</span>
               </div>
             )}
             
-            <div className="rounded-md shadow-sm -space-y-px">
+            <div className="space-y-4">
               <div>
-                <label htmlFor="username" className="sr-only">Usuario</label>
+                <label htmlFor="username" className="block text-sm font-medium text-ui-text-secondary">Usuario</label>
                 <input
                   id="username"
                   name="username"
@@ -62,12 +69,12 @@ const Login: React.FC = () => {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Usuario"
+                  className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
+                  placeholder="tu-usuario"
                 />
               </div>
               <div>
-                <label htmlFor="password" className="sr-only">Contraseña</label>
+                <label htmlFor="password" className="block text-sm font-medium text-ui-text-secondary">Contraseña</label>
                 <input
                   id="password"
                   name="password"
@@ -76,8 +83,8 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Contraseña"
+                  className="mt-1 block w-full p-3 bg-ui-background border border-ui-border rounded-lg focus:ring-brand-accent focus:border-brand-accent"
+                  placeholder="tu-contraseña"
                 />
               </div>
             </div>
@@ -86,9 +93,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-                  loading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent transition-all duration-200 transform hover:scale-105 shadow-md disabled:opacity-50"
               >
                 {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </button>

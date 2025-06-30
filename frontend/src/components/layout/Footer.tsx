@@ -10,7 +10,8 @@ const Footer: React.FC = () => {
         <div className="text-center mb-8">
           <h2 className="font-title text-3xl font-bold text-white mb-2">Rifas Los Andes</h2>
           <p className="text-gray-400 max-w-md mx-auto">
-            Tu oportunidad de ganar un Toyota Corolla 2020 SE por solo $30 USD.
+          Adquiere tu número por $30 y participa por un Toyota Corolla 2020.
+          Una oportunidad real, estés donde estés.
           </p>
         </div>
 
