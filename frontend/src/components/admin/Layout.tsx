@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { AuthService } from '../../services/auth.service';
+import Breadcrumbs from './common/Breadcrumbs'; // Importar Breadcrumbs
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -141,6 +142,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
         {/* Contenido Principal */}
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
+            <Breadcrumbs /> {/* Añadir Breadcrumbs aquí */}
             <h1 className="text-2xl font-bold text-ui-text-primary mb-6 md:hidden">
               {title}
             </h1>
