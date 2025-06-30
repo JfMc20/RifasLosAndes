@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { Raffle, Promotion } from '../../types';
 
 interface RaffleFormProps {
@@ -9,6 +10,11 @@ interface RaffleFormProps {
   onSubmit: (raffleData: Partial<Raffle>, promotions: Partial<Promotion>[]) => Promise<void>;
 }
 
+// Define un tipo para los datos del formulario para react-hook-form
+type RaffleFormData = Omit<Partial<Raffle>, 'promotions'> & {
+  promotions: Partial<Promotion>[];
+};
+
 const RaffleForm: React.FC<RaffleFormProps> = ({
   initialRaffle,
   initialPromotions = [],
@@ -16,133 +22,74 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
   onSubmit,
 }) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  // Estado para la rifa
-  const [raffleData, setRaffleData] = useState<Partial<Raffle>>({
-    name: '',
-    prize: '',
-    totalTickets: 100,
-    ticketPrice: 10,
-    drawMethod: 'Lotería Nacional',
-    isActive: true,
-    ...initialRaffle,
+  // isLoading se usará para el estado de envío del formulario
+  // setError de react-hook-form se usará para errores de API si es necesario, o un estado local.
+  const [apiError, setApiError] = useState('');
+
+  const defaultPromotions = [
+    { quantity: 2, price: 0, description: '2 boletos' },
+    { quantity: 5, price: 0, description: '5 boletos' },
+  ];
+
+  const { register, handleSubmit, control, formState: { errors, isSubmitting }, reset, watch } = useForm<RaffleFormData>({
+    defaultValues: {
+      name: initialRaffle?.name || '',
+      prize: initialRaffle?.prize || '',
+      totalTickets: initialRaffle?.totalTickets || 100,
+      ticketPrice: initialRaffle?.ticketPrice || 10,
+      drawMethod: initialRaffle?.drawMethod || 'Lotería Nacional',
+      isActive: initialRaffle?.isActive === undefined ? true : initialRaffle.isActive,
+      promotions: initialPromotions && initialPromotions.length > 0 ? initialPromotions : defaultPromotions,
+    }
   });
 
-  // Estado para las promociones
-  const [promotions, setPromotions] = useState<Partial<Promotion>[]>(
-    initialPromotions.length > 0 
-      ? initialPromotions 
-      : [
-          { quantity: 2, price: 0, description: '2 boletos' },
-          { quantity: 5, price: 0, description: '5 boletos' },
-        ]
-  );
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "promotions"
+  });
 
-  // Actualizar estados cuando cambian los props
+  // Observar isActive para la lógica de UI si es necesario
+  const isActiveValue = watch("isActive");
+
+
+  // Resetear el formulario cuando initialRaffle o initialPromotions cambien (para modo edición)
   useEffect(() => {
-    if (initialRaffle) {
-      setRaffleData({
-        ...raffleData,
-        ...initialRaffle,
+    if (isEditing && initialRaffle) {
+      reset({
+        name: initialRaffle.name,
+        prize: initialRaffle.prize,
+        totalTickets: initialRaffle.totalTickets,
+        ticketPrice: initialRaffle.ticketPrice,
+        drawMethod: initialRaffle.drawMethod,
+        isActive: initialRaffle.isActive,
+        promotions: initialPromotions && initialPromotions.length > 0 ? initialPromotions : defaultPromotions,
       });
     }
-    
-    if (initialPromotions && initialPromotions.length > 0) {
-      setPromotions(initialPromotions);
-    }
-  }, [initialRaffle, initialPromotions]);
+  }, [initialRaffle, initialPromotions, isEditing, reset]);
 
-  // Manejar cambios en los campos de la rifa
-  const handleRaffleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    
-    // Convertir a número para campos numéricos
-    if (type === 'number') {
-      setRaffleData({
-        ...raffleData,
-        [name]: parseFloat(value),
-      });
-    } 
-    // Convertir a booleano para checkbox
-    else if (type === 'checkbox') {
-      const target = e.target as HTMLInputElement;
-      setRaffleData({
-        ...raffleData,
-        [name]: target.checked,
-      });
-    } 
-    // Texto normal para el resto
-    else {
-      setRaffleData({
-        ...raffleData,
-        [name]: value,
-      });
-    }
-  };
 
-  // Manejar cambios en los campos de promociones
-  const handlePromotionChange = (index: number, field: string, value: any) => {
-    const updatedPromotions = [...promotions];
-    updatedPromotions[index] = {
-      ...updatedPromotions[index],
-      [field]: field === 'quantity' || field === 'price' ? parseFloat(value) : value,
-    };
-    setPromotions(updatedPromotions);
-  };
-
-  // Agregar nueva promoción
-  const addPromotion = () => {
-    setPromotions([
-      ...promotions,
-      {
-        quantity: 0,
-        price: 0,
-        description: '',
-      },
-    ]);
-  };
-
-  // Eliminar promoción
-  const removePromotion = (index: number) => {
-    const updatedPromotions = [...promotions];
-    updatedPromotions.splice(index, 1);
-    setPromotions(updatedPromotions);
-  };
-
-  // Manejar envío del formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validaciones
-    if (!raffleData.name || !raffleData.prize || !raffleData.totalTickets || !raffleData.ticketPrice) {
-      setError('Por favor completa todos los campos requeridos');
-      return;
-    }
-
+  const handleFormSubmit = async (data: RaffleFormData) => {
+    setApiError(''); // Limpiar errores de API previos
     try {
-      setIsLoading(true);
-      setError('');
-      await onSubmit(raffleData, promotions);
+      // Separar promotions de raffleData según la firma de onSubmit
+      const { promotions, ...raffleDetails } = data;
+      await onSubmit(raffleDetails, promotions);
     } catch (err: any) {
       console.error('Error al guardar rifa:', err);
-      setError(err.response?.data?.message || 'Ocurrió un error al guardar. Por favor intenta nuevamente.');
-    } finally {
-      setIsLoading(false);
+      setApiError(err.response?.data?.message || 'Ocurrió un error al guardar. Por favor intenta nuevamente.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {error && (
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
+      {apiError && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg flex items-center gap-4" role="alert">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-                <strong className="font-bold">¡Error!</strong>
-                <p>{error}</p>
+                <strong className="font-bold">¡Error de API!</strong>
+                <p>{apiError}</p>
             </div>
         </div>
       )}
@@ -159,27 +106,23 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
             <input
               type="text"
               id="name"
-              name="name"
-              value={raffleData.name || ''}
-              onChange={handleRaffleChange}
-              required
-              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              {...register("name", { required: "El nombre de la rifa es obligatorio." })}
+              className={`block w-full p-3 bg-ui-background border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
               placeholder="Ej: Rifa para el viaje de estudios"
             />
+            {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
           </div>
 
           <div className="md:col-span-2">
             <label htmlFor="prize" className="block text-sm font-bold text-ui-text-secondary mb-2">Premio</label>
             <textarea
               id="prize"
-              name="prize"
-              value={raffleData.prize || ''}
-              onChange={handleRaffleChange}
-              required
+              {...register("prize", { required: "El premio es obligatorio." })}
               rows={3}
-              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              className={`block w-full p-3 bg-ui-background border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.prize ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
               placeholder="Ej: Un auto 0km, un viaje a la playa, etc."
             />
+            {errors.prize && <p className="mt-1 text-xs text-red-500">{errors.prize.message}</p>}
           </div>
 
           <div>
@@ -187,12 +130,14 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
             <input
               type="number"
               id="totalTickets"
-              name="totalTickets"
-              value={raffleData.totalTickets || ''}
-              onChange={handleRaffleChange}
-              required
-              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              {...register("totalTickets", {
+                required: "El total de boletos es obligatorio.",
+                valueAsNumber: true,
+                min: { value: 1, message: "Debe haber al menos 1 boleto." }
+              })}
+              className={`block w-full p-3 bg-ui-background border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.totalTickets ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
             />
+            {errors.totalTickets && <p className="mt-1 text-xs text-red-500">{errors.totalTickets.message}</p>}
           </div>
 
           <div>
@@ -200,21 +145,22 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
             <input
               type="number"
               id="ticketPrice"
-              name="ticketPrice"
-              value={raffleData.ticketPrice || ''}
-              onChange={handleRaffleChange}
-              required
-              className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+              {...register("ticketPrice", {
+                required: "El precio del boleto es obligatorio.",
+                valueAsNumber: true,
+                min: { value: 0.01, message: "El precio debe ser mayor que cero." }
+              })}
+              step="0.01"
+              className={`block w-full p-3 bg-ui-background border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.ticketPrice ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
             />
+            {errors.ticketPrice && <p className="mt-1 text-xs text-red-500">{errors.ticketPrice.message}</p>}
           </div>
 
           <div>
             <label htmlFor="drawMethod" className="block text-sm font-bold text-ui-text-secondary mb-2">Método de Sorteo</label>
             <select
               id="drawMethod"
-              name="drawMethod"
-              value={raffleData.drawMethod || ''}
-              onChange={handleRaffleChange}
+              {...register("drawMethod")}
               className="block w-full p-3 bg-ui-background border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
             >
               <option>Lotería Nacional</option>
@@ -226,10 +172,8 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
           <div className="flex items-center justify-start mt-6">
             <input
               id="isActive"
-              name="isActive"
               type="checkbox"
-              checked={raffleData.isActive || false}
-              onChange={handleRaffleChange}
+              {...register("isActive")}
               className="h-5 w-5 text-brand-accent bg-ui-background border-ui-border rounded focus:ring-brand-accent transition"
             />
             <label htmlFor="isActive" className="ml-3 block text-sm font-bold text-ui-text-primary">
@@ -247,7 +191,7 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
           </div>
           <button
             type="button"
-            onClick={addPromotion}
+            onClick={() => append({ quantity: 0, price: 0, description: '' })}
             className="px-4 py-2 bg-brand-accent text-white font-bold rounded-lg hover:bg-brand-accent-dark transition-all duration-200 transform hover:scale-105 shadow-md"
           >
             Agregar Promoción
@@ -261,45 +205,56 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
           </div>
         ) : (
           <div className="space-y-4">
-            {promotions.map((promotion, index) => (
-              <div key={index} className="flex flex-wrap items-end gap-4 p-4 rounded-lg border border-ui-border bg-ui-background">
+            {fields.map((item, index) => (
+              <div key={item.id} className="flex flex-wrap items-start gap-4 p-4 rounded-lg border border-ui-border bg-ui-background">
                 <div className="flex-grow min-w-[100px]">
-                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Cantidad</label>
+                  <label htmlFor={`promotions.${index}.quantity`} className="block text-sm font-bold text-ui-text-secondary mb-1">Cantidad</label>
                   <input
                     type="number"
-                    value={promotion.quantity || ''}
-                    onChange={(e) => handlePromotionChange(index, 'quantity', e.target.value)}
-                    min="2"
-                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+                    id={`promotions.${index}.quantity`}
+                    {...register(`promotions.${index}.quantity` as const, {
+                      valueAsNumber: true,
+                      required: "Cantidad es requerida.",
+                      min: { value: 1, message: "Mínimo 1." }
+                    })}
+                    className={`block w-full p-3 bg-ui-surface border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.promotions?.[index]?.quantity ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
                   />
+                  {errors.promotions?.[index]?.quantity && <p className="mt-1 text-xs text-red-500">{errors.promotions[index]?.quantity?.message}</p>}
                 </div>
                 
                 <div className="flex-grow min-w-[100px]">
-                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Precio ($)</label>
+                  <label htmlFor={`promotions.${index}.price`} className="block text-sm font-bold text-ui-text-secondary mb-1">Precio ($)</label>
                   <input
                     type="number"
-                    value={promotion.price || ''}
-                    onChange={(e) => handlePromotionChange(index, 'price', e.target.value)}
-                    min="0.01"
+                    id={`promotions.${index}.price`}
+                    {...register(`promotions.${index}.price` as const, {
+                        valueAsNumber: true,
+                        required: "Precio es requerido.",
+                        min: { value: 0.01, message: "Precio > 0." }
+                    })}
                     step="0.01"
-                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+                    className={`block w-full p-3 bg-ui-surface border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.promotions?.[index]?.price ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
                   />
+                  {errors.promotions?.[index]?.price && <p className="mt-1 text-xs text-red-500">{errors.promotions[index]?.price?.message}</p>}
                 </div>
                 
                 <div className="flex-grow min-w-[200px]">
-                  <label className="block text-sm font-bold text-ui-text-secondary mb-2">Descripción</label>
+                  <label htmlFor={`promotions.${index}.description`} className="block text-sm font-bold text-ui-text-secondary mb-1">Descripción</label>
                   <input
                     type="text"
-                    value={promotion.description || ''}
-                    onChange={(e) => handlePromotionChange(index, 'description', e.target.value)}
-                    className="block w-full p-3 bg-ui-surface border-ui-border rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-brand-accent transition"
+                    id={`promotions.${index}.description`}
+                    {...register(`promotions.${index}.description` as const, {
+                        required: "Descripción es requerida."
+                    })}
+                    className={`block w-full p-3 bg-ui-surface border rounded-lg focus:ring-2 focus:border-brand-accent transition ${errors.promotions?.[index]?.description ? 'border-red-500 focus:ring-red-500' : 'border-ui-border focus:ring-brand-accent'}`}
                   />
+                  {errors.promotions?.[index]?.description && <p className="mt-1 text-xs text-red-500">{errors.promotions[index]?.description?.message}</p>}
                 </div>
                 
-                <div>
+                <div className="pt-7"> {/* Alineación vertical del botón con los inputs */}
                   <button
                     type="button"
-                    onClick={() => removePromotion(index)}
+                    onClick={() => remove(index)}
                     className="p-3 text-brand-danger hover:bg-brand-danger/10 rounded-lg transition-colors duration-200"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -323,10 +278,10 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
         </button>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isSubmitting}
           className="px-6 py-3 border border-transparent shadow-lg text-sm font-bold rounded-lg text-white bg-brand-primary hover:bg-brand-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent disabled:opacity-50 transition-all duration-200 transform hover:scale-105"
         >
-          {isLoading ? 'Guardando...' : isEditing ? 'Actualizar Rifa' : 'Crear Rifa'}
+          {isSubmitting ? 'Guardando...' : isEditing ? 'Actualizar Rifa' : 'Crear Rifa'}
         </button>
       </div>
     </form>
