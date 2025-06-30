@@ -175,7 +175,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.enabled}
                       onChange={handleChange}
-                      className="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded"
+                      className="h-5 w-5 text-brand-accent focus:ring-brand-accent border-gray-300 rounded"
                     />
                     <label htmlFor="enabled" className="ml-3 font-medium text-gray-700">
                       Habilitar notificaciones por WhatsApp
@@ -198,7 +198,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                       value={formData.apiKey}
                       onChange={handleChange}
                       disabled={!formData.enabled}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                       placeholder="Tu API Key de WhatsApp"
                     />
                     <p className="mt-1 text-xs text-gray-500">
@@ -217,7 +217,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                       value={formData.phoneNumberId}
                       onChange={handleChange}
                       disabled={!formData.enabled}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                       placeholder="ID del número de teléfono (de WhatsApp Business)"
                     />
                   </div>
@@ -233,7 +233,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                       value={formData.fromPhoneNumber}
                       onChange={handleChange}
                       disabled={!formData.enabled}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                       placeholder="+56912345678"
                     />
                     <p className="mt-1 text-xs text-gray-500">
@@ -252,7 +252,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                       value={formData.notificationTemplate}
                       onChange={handleChange}
                       disabled={!formData.enabled}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                       placeholder="Hola {{nombre}}, gracias por tu compra del boleto #{{numero}} para la rifa {{rifa}}. ¡Mucha suerte!"
                     ></textarea>
                     <p className="mt-1 text-xs text-gray-500">
@@ -265,7 +265,7 @@ const WhatsAppSettingsPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={saving || !formData.enabled}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
                   >
                     {saving ? 'Guardando...' : 'Guardar configuración'}
                   </button>
@@ -289,13 +289,13 @@ const WhatsAppSettingsPage: React.FC = () => {
                       value={testPhoneNumber}
                       onChange={(e) => setTestPhoneNumber(e.target.value)}
                       disabled={!formData.enabled}
-                      className="block w-full rounded-l-md border-r-0 border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                      className="block w-full rounded-l-md border-r-0 border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                       placeholder="+56912345678"
                     />
                     <button
                       type="submit"
                       disabled={testing || !formData.enabled || !testPhoneNumber}
-                      className="px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                      className="px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
                     >
                       {testing ? 'Enviando...' : 'Enviar prueba'}
                     </button>
@@ -316,13 +316,13 @@ const WhatsAppSettingsPage: React.FC = () => {
                 <p>Para configurar la integración con WhatsApp Business API, necesitarás:</p>
                 
                 <ol className="list-decimal pl-5 space-y-2">
-                  <li>Crear una cuenta en <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Meta for Developers</a></li>
+                  <li>Crear una cuenta en <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-brand-accent hover:underline">Meta for Developers</a></li>
                   <li>Configurar una aplicación con acceso a WhatsApp Business API</li>
                   <li>Obtener tu API Key y Phone Number ID</li>
                   <li>Crear y aprobar plantillas de mensajes</li>
                 </ol>
                 
-                <p className="mt-4">Para más información, consulta la <a href="https://developers.facebook.com/docs/whatsapp" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">documentación oficial de WhatsApp Business API</a>.</p>
+                <p className="mt-4">Para más información, consulta la <a href="https://developers.facebook.com/docs/whatsapp" target="_blank" rel="noopener noreferrer" className="text-brand-accent hover:underline">documentación oficial de WhatsApp Business API</a>.</p>
               </div>
             </div>
           </div>

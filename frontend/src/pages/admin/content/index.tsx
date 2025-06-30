@@ -214,7 +214,7 @@ const ContentManagementPage: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">Contenido de la Sección Principal</h3>
                     <button
                       onClick={handleEditContent}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                     >
                       Editar Contenido
                     </button>
@@ -266,7 +266,7 @@ const ContentManagementPage: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">Ticker Informativo</h3>
                     <button
                       onClick={handleEditContent}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                     >
                       Editar Ticker Informativo
                     </button>
@@ -323,7 +323,7 @@ const ContentManagementPage: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">Carrusel de Premio</h3>
                     <button
                       onClick={handleEditContent}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                     >
                       Editar Carrusel de Premio
                     </button>
@@ -381,7 +381,7 @@ const ContentManagementPage: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">Preguntas Frecuentes</h3>
                     <button
                       onClick={handleEditContent}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                     >
                       Administrar FAQs
                     </button>
@@ -409,7 +409,7 @@ const ContentManagementPage: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">Métodos de Pago</h3>
                     <button
                       onClick={handleEditContent}
-                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                     >
                       Administrar Métodos de Pago
                     </button>
@@ -463,7 +463,7 @@ const ContentManagementPage: React.FC = () => {
                       </button>
                       <button
                         onClick={handleEditContent}
-                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
                       >
                         Gestionar Archivos
                       </button>
@@ -483,7 +483,7 @@ const ContentManagementPage: React.FC = () => {
                         <p>No hay archivos disponibles.</p>
                         <p className="mt-2">
                           <button 
-                            className="text-primary hover:text-primary-dark"
+                            className="text-brand-accent hover:text-brand-accent-dark"
                             onClick={() => router.push('/admin/uploads')}
                           >
                             Subir archivos

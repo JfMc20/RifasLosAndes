@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -36,36 +36,33 @@ const RafflesPage: React.FC = () => {
     onConfirm: () => {},
   });
 
+  const fetchRafflesData = useCallback(async (pageToFetch: number) => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await RaffleService.getAllRaffles(pageToFetch, RAFFLES_PER_PAGE);
+      setDisplayedRaffles(response.data);
+      setTotalRaffles(response.totalItems);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.currentPage);
+    } catch (err) {
+      console.error('Error al cargar rifas:', err);
+      setError('No se pudieron cargar las rifas. Por favor, intenta nuevamente.');
+      setDisplayedRaffles([]);
+      setTotalRaffles(0);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  }, []); // useCallback para evitar re-creación
+
   useEffect(() => {
-    // Verificar autenticación
     if (!AuthService.isAuthenticated()) {
       router.push('/admin/login');
       return;
     }
-
-    const fetchRafflesData = async (pageToFetch: number) => {
-      setLoading(true);
-      setError('');
-      try {
-        const response = await RaffleService.getAllRaffles(pageToFetch, RAFFLES_PER_PAGE);
-        setDisplayedRaffles(response.data);
-        setTotalRaffles(response.totalItems);
-        setTotalPages(response.totalPages);
-        setCurrentPage(response.currentPage);
-      } catch (err) {
-        console.error('Error al cargar rifas:', err);
-        setError('No se pudieron cargar las rifas. Por favor, intenta nuevamente.');
-        // Mantener datos anteriores o limpiar? Por ahora limpiamos.
-        setDisplayedRaffles([]);
-        setTotalRaffles(0);
-        setTotalPages(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRafflesData(currentPage);
-  }, [router, currentPage]);
+  }, [router, currentPage, fetchRafflesData]);
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber !== currentPage) {

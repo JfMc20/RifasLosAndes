@@ -29,6 +29,8 @@ const TicketsPage: React.FC = () => {
     searchQuery,
     currentPage,
     totalPages,
+    totalItems,
+    ticketsPerPage,
     buyerInfo,
     showSaleModal,
     
@@ -112,6 +114,7 @@ const TicketsPage: React.FC = () => {
             
             {/* Tabla de boletos */}
             <TicketsTable 
+              raffleId={raffleId}
               tickets={currentTickets} 
               selectedTickets={selectedTickets}
               toggleTicketSelection={toggleTicketSelection}

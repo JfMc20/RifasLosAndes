@@ -36,6 +36,14 @@ export interface Ticket {
   updatedAt?: string;
 }
 
+// Interface para la información del comprador
+export interface BuyerInfo {
+  name: string;
+  email: string;
+  phone: string;
+  transactionId: string;
+}
+
 // Interface para las promociones
 export interface Promotion {
   _id: string;

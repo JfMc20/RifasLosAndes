@@ -16,12 +16,11 @@ const DashboardPage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [activeRaffle, setActiveRaffle] = useState<Raffle | null>(null);
-  const [ticketSummary, setTicketSummary] = useState({
+  const [ticketSummary, setTicketSummary] = useState<TicketStatusSummary>({
     [TicketStatus.AVAILABLE]: 0,
     [TicketStatus.RESERVED]: 0,
     [TicketStatus.SOLD]: 0,
   });
-  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -56,33 +55,6 @@ const DashboardPage: React.FC = () => {
           
           console.log('Resumen formateado:', formattedSummary);
           setTicketSummary(formattedSummary);
-          
-          // Obtener todos los tickets para la barra de progreso
-          const allTickets = await TicketService.getAllTickets(raffleData.raffle._id);
-          
-          // Contar boletos por estado para verificar si coincide con el resumen
-          const soldCount = allTickets.filter(t => t.status === TicketStatus.SOLD).length;
-          const reservedCount = allTickets.filter(t => t.status === TicketStatus.RESERVED).length;
-          const availableCount = allTickets.filter(t => t.status === TicketStatus.AVAILABLE).length;
-          
-          console.log('Conteo desde tickets:', {
-            sold: soldCount,
-            reserved: reservedCount,
-            available: availableCount
-          });
-          
-          // Si hay discrepancia, usar el conteo real de tickets
-          if (soldCount > 0 && formattedSummary[TicketStatus.SOLD] === 0) {
-            console.log('Corrigiendo resumen basado en el conteo real de tickets');
-            formattedSummary[TicketStatus.SOLD] = soldCount;
-            formattedSummary[TicketStatus.RESERVED] = reservedCount;
-            formattedSummary[TicketStatus.AVAILABLE] = availableCount;
-            setTicketSummary({...formattedSummary});
-          }
-          
-          console.log('Todos los tickets:', allTickets.length, 'Precio del boleto:', raffleData.raffle.ticketPrice);
-          console.log('Ingresos esperados:', formattedSummary[TicketStatus.SOLD] * raffleData.raffle.ticketPrice);
-          setTickets(allTickets);
         }
 
         setLoading(false);
@@ -163,7 +135,12 @@ const DashboardPage: React.FC = () => {
           <div className="lg:col-span-2 space-y-8">
             <div className="bg-ui-surface shadow-lg rounded-xl p-6 border border-ui-border">
               <h2 className="text-2xl font-bold text-ui-text-primary mb-4">Progreso de Ventas</h2>
-              <TicketProgressBar tickets={tickets} totalTickets={activeRaffle.totalTickets} />
+              <TicketProgressBar 
+                soldCount={ticketSummary[TicketStatus.SOLD]}
+                reservedCount={ticketSummary[TicketStatus.RESERVED]}
+                availableCount={ticketSummary[TicketStatus.AVAILABLE]}
+                totalTickets={activeRaffle.totalTickets} 
+              />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

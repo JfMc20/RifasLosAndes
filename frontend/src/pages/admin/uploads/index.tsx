@@ -205,7 +205,7 @@ const UploadsPage: React.FC = () => {
               />
               <label
                 htmlFor="file-upload"
-                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-accent hover:bg-brand-accent-dark'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent`}
               >
                 {uploading ? 'Subiendo...' : 'Subir archivos'}
               </label>
@@ -229,7 +229,7 @@ const UploadsPage: React.FC = () => {
               type="text"
               name="search"
               id="search"
-              className="focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+              className="focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
               placeholder="Buscar por nombre o tipo de archivo..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -258,7 +258,7 @@ const UploadsPage: React.FC = () => {
                             type="checkbox"
                             checked={selectedFiles.length > 0 && selectedFiles.length === filteredFiles.length}
                             onChange={selectAllFiles}
-                            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                                        className="h-4 w-4 text-brand-accent focus:ring-brand-accent border-gray-300 rounded"
                           />
                         </th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -292,7 +292,7 @@ const UploadsPage: React.FC = () => {
                               type="checkbox"
                               checked={selectedFiles.includes(file._id)}
                               onChange={() => toggleFileSelection(file._id)}
-                              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                                          className="h-4 w-4 text-brand-accent focus:ring-brand-accent border-gray-300 rounded"
                             />
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">

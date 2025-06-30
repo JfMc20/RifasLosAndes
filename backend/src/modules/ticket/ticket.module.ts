@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PdfModule } from '../pdf/pdf.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Ticket, TicketSchema } from '../../common/schemas/ticket.schema';
 import { Raffle, RaffleSchema } from '../../common/schemas/raffle.schema';
@@ -8,6 +9,7 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    PdfModule,
     MongooseModule.forFeature([
       { name: Ticket.name, schema: TicketSchema },
       { name: Raffle.name, schema: RaffleSchema },

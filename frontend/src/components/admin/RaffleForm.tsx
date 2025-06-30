@@ -50,6 +50,7 @@ const RaffleForm: React.FC<RaffleFormProps> = ({
 
   // Observar isActive para la lógica de UI si es necesario
   const isActiveValue = watch("isActive");
+  const promotions = watch("promotions");
 
 
   // Resetear el formulario cuando initialRaffle o initialPromotions cambien (para modo edición)

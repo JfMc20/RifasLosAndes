@@ -189,7 +189,7 @@ const EditUserPage: React.FC = () => {
                     required
                     value={formData.username}
                     onChange={handleChange}
-                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                     placeholder="nombreusuario"
                   />
                 </div>
@@ -204,7 +204,7 @@ const EditUserPage: React.FC = () => {
                     id="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                     placeholder="Nombre y apellido"
                   />
                 </div>
@@ -220,7 +220,7 @@ const EditUserPage: React.FC = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                     placeholder="ejemplo@correo.com"
                   />
                 </div>
@@ -235,7 +235,7 @@ const EditUserPage: React.FC = () => {
                     required
                     value={formData.role}
                     onChange={handleChange}
-                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                    className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                     // Deshabilitar cambio de rol si es el usuario actual y es el único admin
                     disabled={
                       currentUser && 
@@ -262,7 +262,7 @@ const EditUserPage: React.FC = () => {
                       type="checkbox"
                       checked={formData.changePassword}
                       onChange={handleChange}
-                      className="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded"
+                                            className="h-5 w-5 text-brand-accent focus:ring-brand-accent border-gray-300 rounded"
                     />
                     <label htmlFor="changePassword" className="ml-3 block text-sm font-medium text-gray-900">
                       Cambiar contraseña
@@ -282,7 +282,7 @@ const EditUserPage: React.FC = () => {
                         id="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                        className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                         minLength={8}
                         required={formData.changePassword}
                         placeholder="********"
@@ -302,7 +302,7 @@ const EditUserPage: React.FC = () => {
                         id="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                        className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                         minLength={8}
                         required={formData.changePassword}
                         placeholder="********"
@@ -316,14 +316,14 @@ const EditUserPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => router.push('/admin/users')}
-                  className="px-5 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
+                  className="px-5 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 transition-all"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all disabled:opacity-50"
+                                    className="px-5 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 transition-all disabled:opacity-50"
                 >
                   {saving ? 'Guardando...' : 'Guardar cambios'}
                 </button>
@@ -335,7 +335,7 @@ const EditUserPage: React.FC = () => {
             <p>No se encontró el usuario solicitado.</p>
             <button
               onClick={() => router.push('/admin/users')}
-              className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none"
+                            className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
             >
               Volver a Usuarios
             </button>

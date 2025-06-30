@@ -28,6 +28,12 @@ ENV NODE_ENV production
 # Copia el servidor standalone y sus dependencias
 COPY --from=builder /app/.next/standalone ./
 
+# Copia package.json para poder instalar sharp
+COPY --from=builder /app/package*.json ./
+
+# Instala las dependencias de producción para asegurar que sharp esté disponible
+RUN npm ci --omit=dev
+
 # Copia archivos públicos y estáticos necesarios
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static

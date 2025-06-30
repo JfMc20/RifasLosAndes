@@ -163,7 +163,7 @@ const InfoTickerPage: React.FC = () => {
                           onChange={handleInputChange}
                           required
                           placeholder="Ej: $30"
-                          className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                          className="shadow-sm focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
                       
@@ -179,7 +179,7 @@ const InfoTickerPage: React.FC = () => {
                           onChange={handleInputChange}
                           required
                           placeholder="Ej: 30 de Junio 2025"
-                          className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                          className="shadow-sm focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
                     </div>
@@ -196,7 +196,7 @@ const InfoTickerPage: React.FC = () => {
                         onChange={handleInputChange}
                         required
                         placeholder="Ej: Facebook Live @RifasLosAndes"
-                        className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
                     
@@ -211,7 +211,7 @@ const InfoTickerPage: React.FC = () => {
                         value={infoTicker.additionalInfo || ''}
                         onChange={handleInputChange}
                         placeholder="Información adicional que desee mostrar en el ticker"
-                        className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                        className="shadow-sm focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
                       />
                     </div>
 
@@ -251,7 +251,7 @@ const InfoTickerPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
                   >
                     {saving ? 'Guardando...' : 'Guardar cambios'}
                   </button>

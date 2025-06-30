@@ -36,9 +36,9 @@ export class UserService {
       .exec();
 
     return {
-      data: data.map(user => { // Mapear para asegurar el tipo Omit<User, 'password'> si es necesario
-        const { password, ...userWithoutPassword } = user.toObject(); // .toObject() para plain JS object
-        return userWithoutPassword;
+            data: data.map((user: User) => { // Mapear para asegurar el tipo Omit<User, 'password'> si es necesario
+        const { password, ...userWithoutPassword } = user.toObject();
+        return userWithoutPassword as unknown as Omit<User, 'password'>;
       }),
       currentPage: page,
       totalPages,

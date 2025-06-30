@@ -46,7 +46,7 @@ const FAQForm: React.FC<{
           required
           value={formData.question || ''}
           onChange={handleChange}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
         />
       </div>
       
@@ -61,7 +61,7 @@ const FAQForm: React.FC<{
           rows={4}
           value={formData.answer || ''}
           onChange={handleChange}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
         />
       </div>
       
@@ -75,7 +75,7 @@ const FAQForm: React.FC<{
         </button>
         <button
           type="submit"
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none"
         >
           Guardar
         </button>
@@ -217,7 +217,7 @@ const FAQsManagementPage: React.FC = () => {
               setEditingFaq({ question: '', answer: '' });
             }}
             disabled={isCreating || editingFaq !== null}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
           >
             Agregar nueva FAQ
           </button>

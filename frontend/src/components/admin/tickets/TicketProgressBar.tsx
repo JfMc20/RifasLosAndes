@@ -1,16 +1,20 @@
 import React from 'react';
-import { Ticket, TicketStatus } from '../../../types';
+import { TicketStatus } from '../../../types';
 
 interface TicketProgressBarProps {
-  tickets: Ticket[];
+  soldCount: number;
+  reservedCount: number;
+  availableCount: number;
   totalTickets: number;
 }
 
-const TicketProgressBar: React.FC<TicketProgressBarProps> = ({ tickets, totalTickets }) => {
-  // Calcular estadísticas
-  const soldCount = tickets.filter(ticket => ticket.status === TicketStatus.SOLD).length;
-  const reservedCount = tickets.filter(ticket => ticket.status === TicketStatus.RESERVED).length;
-  const availableCount = tickets.filter(ticket => ticket.status === TicketStatus.AVAILABLE).length;
+const TicketProgressBar: React.FC<TicketProgressBarProps> = ({ 
+  soldCount,
+  reservedCount,
+  availableCount,
+  totalTickets 
+}) => {
+  // Las estadísticas ahora se reciben como props
 
   // Calcular porcentajes
   const soldPercentage = (soldCount / totalTickets) * 100;

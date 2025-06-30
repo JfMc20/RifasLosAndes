@@ -127,7 +127,7 @@ const CreateUserPage: React.FC = () => {
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                   placeholder="nombreusuario"
                 />
               </div>
@@ -142,7 +142,7 @@ const CreateUserPage: React.FC = () => {
                   id="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                   placeholder="Nombre y apellido"
                 />
               </div>
@@ -158,7 +158,7 @@ const CreateUserPage: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                   placeholder="ejemplo@correo.com"
                 />
               </div>
@@ -173,7 +173,7 @@ const CreateUserPage: React.FC = () => {
                   required
                   value={formData.role}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                 >
                   <option value="user">Usuario</option>
                   <option value="admin">Administrador</option>
@@ -192,7 +192,7 @@ const CreateUserPage: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                   minLength={8}
                   placeholder="********"
                 />
@@ -212,7 +212,7 @@ const CreateUserPage: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20"
+                  className="block w-full rounded-md border border-gray-300 bg-gray-50 py-3 px-4 shadow-sm focus:border-brand-accent focus:ring focus:ring-brand-accent focus:ring-opacity-20"
                   minLength={8}
                   placeholder="********"
                 />
@@ -223,14 +223,14 @@ const CreateUserPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => router.push('/admin/users')}
-                className="px-5 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
+                className="px-5 py-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 transition-all"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all disabled:opacity-50"
+                                className="px-5 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 transition-all disabled:opacity-50"
               >
                 {loading ? 'Creando...' : 'Crear usuario'}
               </button>

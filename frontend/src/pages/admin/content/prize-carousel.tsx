@@ -262,7 +262,7 @@ const PrizeCarouselPage: React.FC = () => {
                           rows={3}
                           value={carouselContent.description}
                           onChange={handleInputChange}
-                          className="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                          className="shadow-sm focus:ring-brand-accent focus:border-brand-accent block w-full sm:text-sm border-gray-300 rounded-md"
                           placeholder="Breve descripción sobre el premio que se muestra en el carrusel"
                           required
                         />
@@ -347,7 +347,7 @@ const PrizeCarouselPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
                   >
                     {saving ? 'Guardando...' : 'Guardar cambios'}
                   </button>

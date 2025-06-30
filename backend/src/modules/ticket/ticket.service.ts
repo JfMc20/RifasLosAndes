@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Ticket, TicketStatus } from '../../common/schemas/ticket.schema';
 import { Raffle } from '../../common/schemas/raffle.schema';
-// CreateTicketDto, UpdateTicketDto, UpdateMultipleTicketsStatusDto no se usan directamente aquí para paginación, pero se mantienen por si acaso.
+import { UpdateTicketDto, UpdateMultipleTicketsStatusDto } from '../../common/dto/ticket.dto';
+import { PdfService } from '../pdf/pdf.service';
 
 // Interfaz para la respuesta paginada de tickets
 export interface PaginatedTicketResponse {
@@ -18,6 +19,7 @@ export class TicketService {
   constructor(
     @InjectModel(Ticket.name) private ticketModel: Model<Ticket>,
     @InjectModel(Raffle.name) private raffleModel: Model<Raffle>,
+    private readonly pdfService: PdfService,
   ) {}
 
   // Initialize tickets for a raffle
@@ -206,7 +208,7 @@ export class TicketService {
   // Get ticket status summary
   async getTicketStatusSummary(raffleId: string) {
     const result = await this.ticketModel.aggregate([
-      { $match: { raffle: raffleId } },
+      { $match: { raffle: new Types.ObjectId(raffleId) } },
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ]).exec();
 
@@ -426,5 +428,34 @@ export class TicketService {
       console.error(`Error al completar la venta: ${error.message}`);
       throw new BadRequestException(`Error al completar la venta: ${error.message}`);
     }
+  }
+
+  // Generate PDF for a single ticket
+  async generateTicketPdf(raffleId: string, ticketNumber: string): Promise<Buffer> {
+    const ticket = await this.findTicketByNumber(raffleId, ticketNumber);
+
+    // We need to populate the raffle details for the PDF
+    const populatedTicket = await ticket.populate<{raffle: Raffle}>('raffle');
+
+    if (!populatedTicket || !populatedTicket.raffle) {
+      throw new NotFoundException(`Ticket ${ticketNumber} in raffle ${raffleId} could not be populated with raffle details.`);
+    }
+
+    return this.pdfService.generateTicketPdf(populatedTicket);
+  }
+
+  // Verify ticket by its ID
+  async verifyTicketById(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid Ticket ID format');
+    }
+
+    const ticket = await this.ticketModel.findById(id).populate('raffle', 'name prize').exec();
+
+    if (!ticket) {
+      throw new NotFoundException(`Ticket with ID ${id} not found.`);
+    }
+
+    return ticket;
   }
 }

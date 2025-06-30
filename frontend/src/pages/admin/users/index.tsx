@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import AdminLayout from '../../../components/admin/Layout';
@@ -36,63 +36,61 @@ const UsersPage: React.FC = () => {
     onConfirm: () => {},
   });
 
-  // Verificar autenticación
+  const fetchUsersData = useCallback(async (pageToFetch: number) => {
+    setLoading(true);
+    setError('');
+    try {
+      // Primero, asegurar que tenemos el perfil del usuario actual y que es admin
+      // Esta lógica de perfil podría optimizarse para no correr en cada carga de página si ya se tiene.
+      let currentAdminUser = currentUser;
+      if (!currentAdminUser) {
+        const userProfile = AuthService.getCurrentUser();
+        if (userProfile && '_id' in userProfile) {
+          currentAdminUser = userProfile as User;
+          setCurrentUser(currentAdminUser);
+        } else {
+          currentAdminUser = await AuthService.getProfile();
+          setCurrentUser(currentAdminUser);
+        }
+      }
+
+      if (!currentAdminUser || currentAdminUser.role !== 'admin') {
+        setError('No tienes permisos para ver esta página.');
+        setDisplayedUsers([]);
+        setTotalUsers(0);
+        setTotalPages(0);
+        setLoading(false);
+        return;
+      }
+
+      const response = await UserService.getAllUsers(pageToFetch, USERS_PER_PAGE);
+      setDisplayedUsers(response.data);
+      setTotalUsers(response.totalItems);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.currentPage);
+
+    } catch (err: any) {
+      console.error('Error al cargar usuarios:', err);
+      setError(err.response?.data?.message || 'Error al cargar los usuarios.');
+      setDisplayedUsers([]);
+      setTotalUsers(0);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser, setCurrentUser]);
+
   useEffect(() => {
     if (!AuthService.isAuthenticated()) {
       router.push('/admin/login');
       return;
     }
-
-    const fetchUsersData = async (pageToFetch: number) => {
-      setLoading(true);
-      setError('');
-      try {
-        // Primero, asegurar que tenemos el perfil del usuario actual y que es admin
-        // Esta lógica de perfil podría optimizarse para no correr en cada carga de página si ya se tiene.
-        let currentAdminUser = currentUser;
-        if (!currentAdminUser) {
-          const userProfile = AuthService.getCurrentUser();
-          if (userProfile && '_id' in userProfile) {
-            currentAdminUser = userProfile as User;
-            setCurrentUser(currentAdminUser);
-          } else {
-            currentAdminUser = await AuthService.getProfile();
-            setCurrentUser(currentAdminUser);
-          }
-        }
-
-        if (!currentAdminUser || currentAdminUser.role !== 'admin') {
-          setError('No tienes permisos para ver esta página.');
-          setDisplayedUsers([]);
-          setTotalUsers(0);
-          setTotalPages(0);
-          setLoading(false);
-          return;
-        }
-
-        const response = await UserService.getAllUsers(pageToFetch, USERS_PER_PAGE);
-        setDisplayedUsers(response.data);
-        setTotalUsers(response.totalItems);
-        setTotalPages(response.totalPages);
-        setCurrentPage(response.currentPage);
-
-      } catch (err: any) {
-        console.error('Error al cargar usuarios:', err);
-        setError(err.response?.data?.message || 'Error al cargar los usuarios.');
-        setDisplayedUsers([]);
-        setTotalUsers(0);
-        setTotalPages(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsersData(currentPage);
-  }, [router, currentPage, currentUser]); // currentUser añadido como dependencia
+  }, [router, currentPage, fetchUsersData]);
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber !== currentPage) {
-      setCurrentPage(pageNumber); // Dispara useEffect
+      setCurrentPage(pageNumber);
       window.scrollTo(0, 0);
     }
   };
@@ -162,7 +160,7 @@ const UsersPage: React.FC = () => {
           <div className="flex justify-end">
             <button
               onClick={() => router.push('/admin/users/create')}
-              className="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
+              className="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 transition-all"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -274,7 +272,7 @@ const UsersPage: React.FC = () => {
                             actions={[
                               {
                                 label: "Editar",
-                                color: "primary",
+                                color: "accent",
                                 onClick: () => router.push(`/admin/users/${user._id}/edit`)
                               },
                               ...(currentUser && user._id !== currentUser._id ? [

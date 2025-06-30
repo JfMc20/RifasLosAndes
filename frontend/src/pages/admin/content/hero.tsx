@@ -191,7 +191,7 @@ const HeroContentPage: React.FC = () => {
                     required
                     value={heroContent.title}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                   />
                 </div>
                 
@@ -205,7 +205,7 @@ const HeroContentPage: React.FC = () => {
                     id="subtitle"
                     value={heroContent.subtitle}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                   />
                 </div>
                 
@@ -219,7 +219,7 @@ const HeroContentPage: React.FC = () => {
                     rows={4}
                     value={heroContent.description}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                   />
                 </div>
                 
@@ -233,7 +233,7 @@ const HeroContentPage: React.FC = () => {
                     id="buttonText"
                     value={heroContent.buttonText}
                     onChange={handleInputChange}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-accent focus:ring-brand-accent"
                   />
                 </div>
                 
@@ -273,7 +273,7 @@ const HeroContentPage: React.FC = () => {
                         <div className="flex text-sm text-gray-600 space-x-3">
                           <label
                             htmlFor="image-upload"
-                            className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none"
+                            className="relative cursor-pointer bg-white rounded-md font-medium text-brand-accent hover:text-brand-accent-dark focus-within:outline-none"
                           >
                             <span>Subir imagen</span>
                             <input
@@ -316,7 +316,7 @@ const HeroContentPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none disabled:opacity-50"
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-accent hover:bg-brand-accent-dark focus:outline-none disabled:opacity-50"
                 >
                   {saving ? 'Guardando...' : 'Guardar cambios'}
                 </button>

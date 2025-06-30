@@ -1,14 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Raffle, Ticket, TicketStatus } from '../types';
+import { NotificationService } from '../services/notification.service';
+import { Raffle, Ticket, TicketStatus, BuyerInfo } from '../types';
 import { RaffleService } from '../services/raffle.service';
 import { TicketService } from '../services/ticket.service';
-
-export interface BuyerInfo {
-  name: string;
-  email: string;
-  phone: string;
-  transactionId: string;
-}
 
 export interface UseTicketsResult {
   // Estado
@@ -22,6 +16,8 @@ export interface UseTicketsResult {
   selectedTickets: string[];
   currentTickets: Ticket[];
   totalPages: number;
+  totalItems: number;
+  ticketsPerPage: number;
   buyerInfo: BuyerInfo;
   showSaleModal: boolean;
   debugInfo: any; // Información de depuración
@@ -96,7 +92,7 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
       // y el filtrado/búsqueda se aplicaría sobre los datos de la página actual si se mantiene esa lógica.
       // O, si el backend los soporta, se pasarían aquí:
       // const params = { page: pageToFetch, limit: ticketsPerPage, status: filterStatus, search: searchQuery };
-      const response = await TicketService.getAllTickets(raffleId, pageToFetch, ticketsPerPage);
+      const response = await TicketService.getTickets(raffleId, pageToFetch, ticketsPerPage);
       
       setTickets(response.data);
       setTotalItems(response.totalItems);
@@ -282,6 +278,8 @@ export const useTickets = (raffleId: string | undefined): UseTicketsResult => {
     selectedTickets,
     currentTickets,
     totalPages,
+    totalItems,
+    ticketsPerPage,
     buyerInfo,
     showSaleModal,
     debugInfo,

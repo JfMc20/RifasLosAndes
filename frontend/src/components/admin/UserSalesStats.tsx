@@ -87,7 +87,7 @@ export const UserSalesStats: React.FC<UserSalesProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                   {user.count}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-primary">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-brand-accent">
                   ${user.total.toLocaleString()}
                 </td>
               </tr>
@@ -101,7 +101,7 @@ export const UserSalesStats: React.FC<UserSalesProps> = ({
               <td className="px-6 py-3 text-center text-xs font-medium text-gray-900">
                 {salesArray.reduce((sum, user) => sum + user.count, 0)}
               </td>
-              <td className="px-6 py-3 text-right text-xs font-medium text-primary">
+              <td className="px-6 py-3 text-right text-xs font-medium text-brand-accent">
                 ${salesArray.reduce((sum, user) => sum + user.total, 0).toLocaleString()}
               </td>
             </tr>
