@@ -53,13 +53,21 @@ export class RaffleService {
   }
 
   async findActiveRaffle(): Promise<Raffle> {
-    const activeRaffle = await this.raffleModel.findOne({ isActive: true }).exec();
+    let raffle = await this.raffleModel.findOne({ isActive: true }).exec();
     
-    if (!activeRaffle) {
-      throw new NotFoundException('No active raffle found');
+    if (!raffle) {
+      // If no active raffle is found, get the most recent one
+      console.log('No active raffle found, searching for the most recent one...');
+      raffle = await this.raffleModel.findOne().sort({ createdAt: -1 }).exec();
+    }
+
+    if (!raffle) {
+      // If there are no raffles at all, then throw an error
+      console.error('CRITICAL: No raffles found in the database.');
+      throw new NotFoundException('No raffle found. Please create a raffle in the admin panel.');
     }
     
-    return activeRaffle;
+    return raffle;
   }
 
   async findRaffleById(id: string) {
